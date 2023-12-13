@@ -1,6 +1,6 @@
 /// <reference path="dimensioning.ts" />
 
-module BP3D.Core {
+namespace BP3D.Core {
   // GENERAL:
 
   /** The dimensioning unit for 2D floorplan measurements. */

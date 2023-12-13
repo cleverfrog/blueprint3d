@@ -2,7 +2,7 @@
 /// <reference path="../../lib/three.d.ts" />
 /// <reference path="../core/utils.ts" />
 
-module BP3D.Three {
+namespace BP3D.Three {
   export var Controller = function (three, model, camera, element, controls, hud) {
 
     var scope = this;

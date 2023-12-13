@@ -1,6 +1,6 @@
 /// <reference path="../../lib/three.d.ts" />
 
-module BP3D.Three {
+namespace BP3D.Three {
   export var Skybox = function (scene) {
 
     var scope = this;

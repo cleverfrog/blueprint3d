@@ -5,7 +5,7 @@
 /// <reference path="wall_floor_item.ts" />
 /// <reference path="wall_item.ts" />
 
-module BP3D.Items {
+namespace BP3D.Items {
   /** Enumeration of item types. */
   const item_types = {
     1: Items.FloorItem,

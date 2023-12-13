@@ -7,7 +7,7 @@
 /// <reference path="controls.ts" />
 /// <reference path="hud.ts" />
 
-module BP3D.Three {
+namespace BP3D.Three {
   export var Main = function (model, element, canvasElement, opts) {
     var scope = this;
 

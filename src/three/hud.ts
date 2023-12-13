@@ -1,7 +1,7 @@
 /// <reference path="../../lib/three.d.ts" />
 /// <reference path="../core/utils.ts" />
 
-module BP3D.Three {
+namespace BP3D.Three {
   /**
    * Drawings on "top" of the scene. e.g. rotate arrows
    */

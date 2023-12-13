@@ -3,7 +3,7 @@
 /// <reference path="wall_item.ts" />
 /// <reference path="metadata.ts" />
 
-module BP3D.Items {
+namespace BP3D.Items {
   /** */
   export abstract class InWallItem extends WallItem {
     constructor(model: Model.Model, metadata: Metadata, geometry: THREE.Geometry, material: THREE.MeshFaceMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {

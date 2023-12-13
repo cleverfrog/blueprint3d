@@ -87,3 +87,10 @@ The example directory contains an application built using the core blueprint3d j
 ## License
 
 This project is open-source! See LICENSE.txt for more information.
+
+
+
+## Keeping a record of commands run, just in case they don't all make it into the configuration files.
+
+npm install -g typescript
+npm install -D webpack webpack-cli ts-loader webpack-dev-server

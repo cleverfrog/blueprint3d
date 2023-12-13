@@ -2,7 +2,7 @@
 /// <reference path="../model/floorplan.ts" />
 /// <reference path="floorplanner_view.ts" />
 
-module BP3D.Floorplanner {
+namespace BP3D.Floorplanner {
   /** how much will we move a corner to make a wall axis aligned (cm) */
   const snapTolerance = 25;
 

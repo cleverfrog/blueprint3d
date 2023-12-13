@@ -2,7 +2,7 @@
 /// <reference path="../../lib/jQuery.d.ts" />
 /// <reference path="../core/utils.ts" />
 
-module BP3D.Model {
+namespace BP3D.Model {
   /**
    * Half Edges are created by Room.
    * 

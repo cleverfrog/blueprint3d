@@ -2,7 +2,7 @@
 /// <reference path="floor.ts" />
 /// <reference path="edge.ts" />
 
-module BP3D.Three {
+namespace BP3D.Three {
   export var Floorplan = function (scene, floorplan, controls) {
 
     var scope = this;

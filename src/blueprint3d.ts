@@ -2,7 +2,7 @@
 /// <reference path="floorplanner/floorplanner.ts" />
 /// <reference path="three/main.ts" />
 
-module BP3D {
+namespace BP3D {
   /** Startup options. */
   export interface Options {
     /** */
