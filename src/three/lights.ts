@@ -1,6 +1,5 @@
 /// <reference path="../../lib/three.d.ts" />
 
-namespace BP3D.Three {
   export var Lights = function (scene, floorplan) {
 
     var scope = this;
@@ -69,4 +68,3 @@ namespace BP3D.Three {
 
     init();
   }
-}

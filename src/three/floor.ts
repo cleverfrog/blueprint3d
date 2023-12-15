@@ -1,7 +1,5 @@
 /// <reference path="../../lib/three.d.ts" />
-/// <reference path="../core/utils.ts" />
 
-namespace BP3D.Three {
   export var Floor = function (scene, room) {
 
     var scope = this;
@@ -100,4 +98,3 @@ namespace BP3D.Three {
       scene.remove(room.floorPlane);
     }
   }
-}

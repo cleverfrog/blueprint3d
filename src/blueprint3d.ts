@@ -1,8 +1,7 @@
-/// <reference path="model/model.ts" />
-/// <reference path="floorplanner/floorplanner.ts" />
-/// <reference path="three/main.ts" />
+import { Floorplanner } from "./floorplanner/floorplanner";
+import  { Model }  from "./model/model.ts";
+import { Main } from "./three/main";
 
-namespace BP3D {
   /** Startup options. */
   export interface Options {
     /** */
@@ -20,29 +19,28 @@ namespace BP3D {
     /** The texture directory. */
     textureDir?: string;
   }
-
   /** Blueprint3D core application. */
   export class Blueprint3d {
     
-    private model: Model.Model;
+    private model: Model;
 
     private three: any; // Three.Main;
 
-    private floorplanner: Floorplanner.Floorplanner;
+    private floorplanner: Floorplanner;
 
     /** Creates an instance.
      * @param options The initialization options.
      */
     constructor(options: Options) {
-      this.model = new Model.Model(options.textureDir);
-      this.three = new Three.Main(this.model, options.threeElement, options.threeCanvasElement, {});
+      this.model = new Model(options.textureDir);
+      this.three = new Main(this.model, options.threeElement, options.threeCanvasElement, {});
 
       if (!options.widget) {
-        this.floorplanner = new Floorplanner.Floorplanner(options.floorplannerElement, this.model.floorplan);
+        this.floorplanner = new Floorplanner(options.floorplannerElement, this.model.floorplan);
       }
       else {
         this.three.getController().enabled = false;
       }
     }
   }
-}
+

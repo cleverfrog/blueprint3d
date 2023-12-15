@@ -1,9 +1,9 @@
 /// <reference path="../../lib/three.d.ts" />
-/// <reference path="../core/utils.ts" />
-/// <reference path="../model/model.ts" />
-/// <reference path="metadata.ts" />
 
-namespace BP3D.Items {
+import { Model } from '../model/model.ts';
+import { Utils } from '../core/utils.ts';
+import { Scene } from '../model/scene.ts';
+import { Metadata } from "./metadata.ts";
   /**
    * An Item is an abstract entity for all things placed in the scene,
    * e.g. at walls or on the floor.
@@ -11,7 +11,7 @@ namespace BP3D.Items {
   export abstract class Item extends THREE.Mesh {
 
     /** */
-    private scene: Model.Scene;
+    private scene: Scene;
 
     /** */
     private errorGlow = new THREE.Mesh();
@@ -64,7 +64,7 @@ namespace BP3D.Items {
      * @param rotation TODO
      * @param scale TODO 
      */
-    constructor(protected model: Model.Model, public metadata: Metadata, geometry: THREE.Geometry, material: THREE.MeshFaceMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
+    constructor(protected model: Model, public metadata: Metadata, geometry: THREE.Geometry, material: THREE.MeshFaceMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
       super();
 
       this.scene = this.model.scene;
@@ -219,7 +219,7 @@ namespace BP3D.Items {
     /** */
     public rotate(intersection) {
       if (intersection) {
-        var angle = Core.Utils.angle(
+        var angle = Utils.angle(
           0,
           1,
           intersection.point.x - this.position.x,
@@ -354,4 +354,4 @@ namespace BP3D.Items {
       return glow;
     };
   }
-}
+

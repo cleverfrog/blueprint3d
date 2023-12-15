@@ -1,6 +1,7 @@
 const path = require('path');
+//const CopyPlugin = require("copy-webpack-plugin");
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+//var ExtractTextPlugin = require('extract-text-webpack-plugin');
 //const TranspilePlugin = require('transpile-webpack-plugin');
 module.exports = {
   entry: './src/blueprint3d.ts',
@@ -18,6 +19,12 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   plugins: [
+    /*
+    new CopyPlugin({
+      patterns: [
+        { from: "copyFiles", to: "exTest" },
+      ],
+    }), */
 /*    new ExtractTextPlugin("style.css", {
       allChunks: true
     }), 
@@ -33,9 +40,10 @@ module.exports = {
     filename: 'blueprint3d.js'
   },
   devServer: {
-    static: path.join(__dirname, ""),
-    compress: true,
+    static: path.join(__dirname, "exTest"),
+    compress: false,
     port: 9000,
   },
+
 
 };

@@ -1,8 +1,8 @@
 /// <reference path="../../lib/jQuery.d.ts" />
 /// <reference path="../../lib/three.d.ts" />
-/// <reference path="../core/utils.ts" />
 
-namespace BP3D.Three {
+import { Utils } from "../core/utils";
+
   export var Controller = function (three, model, camera, element, controls, hud) {
 
     var scope = this;
@@ -383,14 +383,14 @@ namespace BP3D.Three {
       }
       // filter by visible, if true
       if (onlyVisible) {
-        intersections = Core.Utils.removeIf(intersections, function (intersection) {
+        intersections = Utils.removeIf(intersections, function (intersection) {
           return !intersection.object.visible;
         });
       }
 
       // filter by normals, if true
       if (filterByNormals) {
-        intersections = Core.Utils.removeIf(intersections, function (intersection) {
+        intersections = Utils.removeIf(intersections, function (intersection) {
           var dot = intersection.face.normal.dot(direction);
           return (dot > 0)
         });
@@ -445,4 +445,4 @@ namespace BP3D.Three {
 
     init();
   }
-}
+

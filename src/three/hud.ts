@@ -1,7 +1,5 @@
 /// <reference path="../../lib/three.d.ts" />
-/// <reference path="../core/utils.ts" />
 
-namespace BP3D.Three {
   /**
    * Drawings on "top" of the scene. e.g. rotate arrows
    */
@@ -161,4 +159,3 @@ namespace BP3D.Three {
 
     init();
   }
-}

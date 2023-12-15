@@ -1,5 +1,3 @@
-namespace BP3D.Core {
-
   /** Collection of utility functions. */
   export class Utils {
 
@@ -363,4 +361,4 @@ namespace BP3D.Core {
       });
     }
   }
-}
+

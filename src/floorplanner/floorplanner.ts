@@ -1,8 +1,8 @@
 /// <reference path="../../lib/jQuery.d.ts" />
-/// <reference path="../model/floorplan.ts" />
-/// <reference path="floorplanner_view.ts" />
 
-namespace BP3D.Floorplanner {
+import { Floorplan } from "../model/floorplan";
+import { FloorplannerView, floorplannerModes } from "./floorplanner_view";
+
   /** how much will we move a corner to make a wall axis aligned (cm) */
   const snapTolerance = 25;
 
@@ -78,7 +78,7 @@ namespace BP3D.Floorplanner {
     private pixelsPerCm: number;
 
     /** */
-    constructor(canvas: string, private floorplan: Model.Floorplan) {
+    constructor(canvas: string, private floorplan: Floorplan) {
 
       this.canvasElement = $("#" + canvas);
 
@@ -295,4 +295,3 @@ namespace BP3D.Floorplanner {
       return (y - this.originY * this.cmPerPixel) * this.pixelsPerCm;
     }
   }
-}

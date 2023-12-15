@@ -1,6 +1,6 @@
-/// <reference path="dimensioning.ts" />
+import { dimInch } from "./dimensioning";
 
-namespace BP3D.Core {
+
   // GENERAL:
 
   /** The dimensioning unit for 2D floorplan measurements. */
@@ -50,4 +50,3 @@ namespace BP3D.Core {
       }
     }
   }
-}

@@ -1,4 +1,3 @@
-namespace BP3D.Items {
   /** Meta data for items. */
   export interface Metadata {
     /** Name of the item. */
@@ -13,4 +12,3 @@ namespace BP3D.Items {
     /** Resizeable or not */
     resizable?: boolean;
   }
-}

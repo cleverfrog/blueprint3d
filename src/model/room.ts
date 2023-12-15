@@ -1,9 +1,10 @@
 /// <reference path="../../lib/three.d.ts" />
 /// <reference path="../../lib/jQuery.d.ts" />
-/// <reference path="../core/utils.ts" />
-/// <reference path="corner.ts" />
-/// <reference path="floorplan.ts" />
-/// <reference path="half_edge.ts" />
+
+import { Corner } from "./corner.ts"
+import { Floorplan } from "./floorplan";
+import { Utils } from "../core/utils.ts";
+import { HalfEdge } from "./half_edge.ts";
 
 /*
 TODO
@@ -12,7 +13,7 @@ var segseg = require('segseg')
 var Polygon = require('polygon')
 */
 
-namespace BP3D.Model {
+
 
   /** Default texture to be used if nothing is provided. */
   const defaultRoomTexture = {
@@ -50,7 +51,7 @@ namespace BP3D.Model {
     }
 
     private getUuid(): string {
-      var cornerUuids = Core.Utils.map(this.corners, function (c) {
+      var cornerUuids = Utils.map(this.corners, function (c) {
         return c.id;
       });
       cornerUuids.sort();
@@ -159,4 +160,4 @@ namespace BP3D.Model {
       this.edgePointer = firstEdge;
     }
   }
-}
+

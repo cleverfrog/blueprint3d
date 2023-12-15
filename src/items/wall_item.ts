@@ -1,17 +1,17 @@
 /// <reference path="../../lib/three.d.ts" />
-/// <reference path="../core/utils.ts" />
-/// <reference path="../model/half_edge.ts" />
-/// <reference path="../model/model.ts" />
-/// <reference path="item.ts" />
-/// <reference path="metadata.ts" />
 
-namespace BP3D.Items {
+import { Utils } from "../core/utils";
+import { HalfEdge } from "../model/half_edge";
+import { Model } from "../model/model";
+import { Item } from "./item";
+import { Metadata } from "./metadata";
+
   /**
    * A Wall Item is an entity to be placed related to a wall.
    */
   export abstract class WallItem extends Item {
     /** The currently applied wall edge. */
-    protected currentWallEdge: Model.HalfEdge = null;
+    protected currentWallEdge: HalfEdge = null;
     /* TODO:
        This caused a huge headache.
        HalfEdges get destroyed/created every time floorplan is edited.
@@ -43,7 +43,7 @@ namespace BP3D.Items {
     /** */
     protected backVisible = false;
 
-    constructor(model: Model.Model, metadata: Metadata, geometry: THREE.Geometry, material: THREE.MeshFaceMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
+    constructor(model: Model, metadata: Metadata, geometry: THREE.Geometry, material: THREE.MeshFaceMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
       super(model, metadata, geometry, material, position, rotation, scale);
 
       this.allowRotate = false;
@@ -52,7 +52,7 @@ namespace BP3D.Items {
     /** Get the closet wall edge.
      * @returns The wall edge.
      */
-    public closestWallEdge(): Model.HalfEdge {
+    public closestWallEdge(): HalfEdge {
 
       var wallEdges = this.model.floorplan.wallEdges();
 
@@ -62,7 +62,7 @@ namespace BP3D.Items {
       var itemX = this.position.x;
       var itemZ = this.position.z;
 
-      wallEdges.forEach((edge: Model.HalfEdge) => {
+      wallEdges.forEach((edge: HalfEdge) => {
         var distance = edge.distanceTo(itemX, itemZ);
         if (minDistance === null || distance < minDistance) {
           minDistance = distance;
@@ -76,7 +76,7 @@ namespace BP3D.Items {
     /** */
     public removed() {
       if (this.currentWallEdge != null && this.addToWall) {
-        Core.Utils.removeValue(this.currentWallEdge.wall.items, this);
+        Utils.removeValue(this.currentWallEdge.wall.items, this);
         this.redrawWall();
       }
     }
@@ -151,10 +151,10 @@ namespace BP3D.Items {
     private changeWallEdge(wallEdge) {
       if (this.currentWallEdge != null) {
         if (this.addToWall) {
-          Core.Utils.removeValue(this.currentWallEdge.wall.items, this);
+          Utils.removeValue(this.currentWallEdge.wall.items, this);
           this.redrawWall();
         } else {
-          Core.Utils.removeValue(this.currentWallEdge.wall.onItems, this);
+          Utils.removeValue(this.currentWallEdge.wall.onItems, this);
         }
       }
 
@@ -170,7 +170,7 @@ namespace BP3D.Items {
       normal2.x = normal3.x;
       normal2.y = normal3.z;
 
-      var angle = Core.Utils.angle(
+      var angle = Utils.angle(
         this.refVec.x, this.refVec.y,
         normal2.x, normal2.y);
       this.rotation.y = angle;
@@ -218,4 +218,3 @@ namespace BP3D.Items {
       vec3.applyMatrix4(edge.invInteriorTransform);
     }
   }
-}

@@ -1,9 +1,11 @@
 /// <reference path="../../lib/three.d.ts" />
 /// <reference path="../../lib/jQuery.d.ts" />
-/// <reference path="../core/utils.ts" />
-/// <reference path="../items/factory.ts" />
+import { GLTFLoader } from "../../lib/GLTFLoader.js";
 
-namespace BP3D.Model {
+import { Factory } from "../items/factory.ts";
+import { Item } from "../items/item.ts"
+import { Model } from "../model/model.ts";
+import { Utils } from "../core/utils.ts"
   /**
    * The Scene is a manager of Items and also links to a ThreeJS scene.
    */
@@ -13,13 +15,13 @@ namespace BP3D.Model {
     private scene: THREE.Scene;
 
     /** */
-    private items: Items.Item[] = [];
+    private items: Item[] = [];
 
     /** */
     public needsUpdate = false;
 
     /** The Json loader. */
-    private loader: THREE.JSONLoader;
+    private loader: GLTFLoader;
 
     /** */
     private itemLoadingCallbacks = $.Callbacks();
@@ -39,7 +41,7 @@ namespace BP3D.Model {
       this.scene = new THREE.Scene();
 
       // init item loader
-      this.loader = new THREE.JSONLoader();
+      this.loader = new GLTFLoader();
       this.loader.crossOrigin = "";
     }
 
@@ -55,7 +57,7 @@ namespace BP3D.Model {
      */
     public remove(mesh: THREE.Mesh) {
       this.scene.remove(mesh);
-      Core.Utils.removeValue(this.items, mesh);
+      Utils.removeValue(this.items, mesh);
     }
 
     /** Gets the scene.
@@ -68,7 +70,7 @@ namespace BP3D.Model {
     /** Gets the items.
      * @returns The items.
      */
-    public getItems(): Items.Item[] {
+    public getItems(): Item[] {
       return this.items;
     }
 
@@ -94,14 +96,14 @@ namespace BP3D.Model {
      * @param item The item to be removed.
      * @param dontRemove If not set, also remove the item from the items list.
      */
-    public removeItem(item: Items.Item, dontRemove?: boolean) {
+    public removeItem(item: Item, dontRemove?: boolean) {
       dontRemove = dontRemove || false;
       // use this for item meshes
       this.itemRemovedCallbacks.fire(item);
       item.removed();
       this.scene.remove(item);
       if (!dontRemove) {
-        Core.Utils.removeValue(this.items, item);
+        Utils.removeValue(this.items, item);
       }
     }
 
@@ -119,7 +121,7 @@ namespace BP3D.Model {
       itemType = itemType || 1;
       var scope = this;
       var loaderCallback = function (geometry: THREE.Geometry, materials: THREE.Material[]) {
-        var item = new (Items.Factory.getClass(itemType))(
+        var item = new (Factory.getClass(itemType))(
           scope.model,
           metadata, geometry,
           new THREE.MeshFaceMaterial(materials),
@@ -140,4 +142,4 @@ namespace BP3D.Model {
       );
     }
   }
-}
+

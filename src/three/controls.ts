@@ -11,7 +11,6 @@ Contributors:
 /// <reference path="../../lib/jQuery.d.ts" />
 /// <reference path="../../lib/three.d.ts" />
 
-namespace BP3D.Three {
   export var Controls = function (object, domElement) {
 
     this.object = object;
@@ -515,4 +514,3 @@ namespace BP3D.Three {
 
     window.addEventListener('keydown', onKeyDown, false);
   };
-}

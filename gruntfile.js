@@ -2,12 +2,15 @@ module.exports = function (grunt) {
 
   require("matchdep").filterAll("grunt-*").forEach(grunt.loadNpmTasks);
 
+  grunt.loadNpmTasks('grunt-npm-install');
+
+  grunt.registerTask('default', ['npm-install:@types/three']);
   var globalConfig = {
     moduleName: "blueprint3d",
     sources: ["src/*.ts", "src/*/*.ts"],
     outDir: "dist",
     docDir: "doc",
-    exampleDir: "example/js/"
+    exampleDir: "exTest/js/"
   };
 
   var configuration = {
@@ -67,6 +70,9 @@ module.exports = function (grunt) {
   configuration.uglify[globalConfig.moduleName].files["dist/" + globalConfig.moduleName + ".min.js"] = globalConfig.outDir + "/" + globalConfig.moduleName +".js";
 
   grunt.initConfig(configuration);
+
+
+  
 
   grunt.registerTask("debug", [
     "typescript:" + globalConfig.moduleName
