@@ -1,5 +1,4 @@
 /// <reference path="../../lib/jQuery.d.ts" />
-/// <reference path="../../lib/three.d.ts" />
 
 import { Controller } from "./controller";
 import { Controls } from "./controls";
@@ -7,6 +6,7 @@ import { Floorplan } from "./floorPlan";
 import { HUD } from "./hud";
 import { Lights } from "./lights";
 import { Skybox } from "./skybox";
+import * as THREE from "../../libs/r159/three.module.js"
 
   export var Main = function (model, element, canvasElement, opts) {
     var scope = this;

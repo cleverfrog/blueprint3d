@@ -1,4 +1,4 @@
-/// <reference path="../../lib/three.d.ts" />
+import * as THREE from 'three'
 
 import { Edge } from './edge.ts';
 import { Floor } from './floor';

@@ -9,7 +9,7 @@ Contributors:
  */
 
 /// <reference path="../../lib/jQuery.d.ts" />
-/// <reference path="../../lib/three.d.ts" />
+import * as THREE from 'three'
 
   export var Controls = function (object, domElement) {
 

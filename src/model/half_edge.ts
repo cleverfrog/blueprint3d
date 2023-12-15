@@ -1,4 +1,4 @@
-/// <reference path="../../lib/three.d.ts" />
+import * as THREE from 'three'
 /// <reference path="../../lib/jQuery.d.ts" />
 
 import { Room } from "../model/room.ts";

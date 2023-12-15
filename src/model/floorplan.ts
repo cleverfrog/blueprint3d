@@ -1,5 +1,5 @@
 /// <reference path="../../lib/jQuery.d.ts" />
-/// <reference path="../../lib/three.d.ts" />
+import * as THREE from 'three'
 
 import { Corner } from "./corner.ts"
 import { Wall } from "./wall.ts"

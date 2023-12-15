@@ -1,4 +1,4 @@
-/// <reference path="../../lib/three.d.ts" />
+import * as THREE from 'three'
 
 import { Model } from '../model/model.ts';
 import { Utils } from '../core/utils.ts';
@@ -64,7 +64,7 @@ import { Metadata } from "./metadata.ts";
      * @param rotation TODO
      * @param scale TODO 
      */
-    constructor(protected model: Model, public metadata: Metadata, geometry: THREE.Geometry, material: THREE.MeshFaceMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
+    constructor(protected model: Model, public metadata: Metadata, geometry: THREE.BufferGeometry, material: THREE.MeshStandardMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
       super();
 
       this.scene = this.model.scene;
@@ -172,7 +172,7 @@ import { Metadata } from "./metadata.ts";
       var on = this.hover || this.selected;
       this.highlighted = on;
       var hex = on ? this.emissiveColor : 0x000000;
-      (<THREE.MeshFaceMaterial>this.material).materials.forEach((material) => {
+      (<THREE.MeshStandardMaterial>this.material).forEach((material) => {
         // TODO_Ekki emissive doesn't exist anymore?
         (<any>material).emissive.setHex(hex);
       });

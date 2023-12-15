@@ -1,4 +1,4 @@
-/// <reference path="../../lib/three.d.ts" />
+import * as THREE from 'three'
 
 import { Utils } from "../core/utils";
 import { Model } from "../model/model";

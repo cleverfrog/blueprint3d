@@ -1,4 +1,4 @@
-/// <reference path="../../lib/three.d.ts" />
+import * as THREE from 'three'
 
   /**
    * Drawings on "top" of the scene. e.g. rotate arrows

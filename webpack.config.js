@@ -15,6 +15,10 @@ module.exports = {
       },
     ],
   },
+  externals: {
+    jquery: "jQuery",
+    three: "THREE"
+  },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
