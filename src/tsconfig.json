@@ -7,8 +7,8 @@
       "preserveConstEnums": true,
       "sourceMap": true,
       "strict": false,
-      "allowImportingTsExtensions": true,
-      "noEmit": true,
+//      "allowImportingTsExtensions": true,
+    //  "noEmit": true,
       "outDir": "../exTest/js"
     },
     "include": ["./**/*"],

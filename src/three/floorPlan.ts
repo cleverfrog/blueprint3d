@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 
-import { Edge } from './edge.ts';
+import { Edge } from './edge';
 import { Floor } from './floor';
 
   export var Floorplan = function (scene, floorplan, controls) {

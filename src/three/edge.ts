@@ -3,7 +3,44 @@ import * as THREE from 'three'
 
 import { Utils } from "../core/utils";
 
-  export var Edge = function (scene, edge, controls) {
+function toVec3(pos, height?) {
+  height = height || 0;
+  return new THREE.Vector3(pos.x, height, pos.y);
+}
+
+function buildSideFillter(p1, p2, height, color) {
+  var points = [
+    toVec3(p1),
+    toVec3(p2),
+    toVec3(p2, height),
+    toVec3(p1, height)
+  ];
+
+  var geometry = new THREE.BufferGeometry().setFromPoints(points);
+  let indices = new Uint16Array( [
+    0, 1, 2,
+    0, 2, 3
+  ] );
+  geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+/*    
+check logic change
+points.forEach((p) => {
+    geometry.vertices.push(p);
+  });
+  geometry.faces.push(new THREE.Face3(0, 1, 2));
+  geometry.faces.push(new THREE.Face3(0, 2, 3));
+*/
+
+  var fillerMaterial = new THREE.MeshBasicMaterial({
+    color: color,
+    side: THREE.DoubleSide
+  });
+
+  var filler = new THREE.Mesh(geometry, fillerMaterial);
+  return filler;
+}
+
+export var Edge = function (scene, edge, controls) {
     var scope = this;
     var scene = scene;
     var edge = edge;
@@ -15,7 +52,7 @@ import { Utils } from "../core/utils";
     var basePlanes = []; // always visible
     var texture = null;
 
-    var lightMap = THREE.ImageUtils.loadTexture("rooms/textures/walllightmap.png");
+    var lightMap = new THREE.TextureLoader().load("rooms/textures/walllightmap.png");
     var fillerColor = 0xdddddd;
     var sideColor = 0xcccccc;
     var baseColor = 0xdddddd;
@@ -114,7 +151,7 @@ import { Utils } from "../core/utils";
       var stretch = textureData.stretch;
       var url = textureData.url;
       var scale = textureData.scale;
-      texture = THREE.ImageUtils.loadTexture(url, null, callback);
+      texture = new THREE.TextureLoader().load(url, callback);
       if (!stretch) {
         var height = wall.height;
         var width = edge.interiorDistance();
@@ -158,6 +195,7 @@ import { Utils } from "../core/utils";
 
       // bottom
       // put into basePlanes since this is always visible
+      /* Issue:  -- buildfiller doesn't seem to exist
       basePlanes.push(buildFiller(
         edge, 0,
         THREE.BackSide, baseColor));
@@ -166,7 +204,7 @@ import { Utils } from "../core/utils";
       planes.push(buildFiller(
         edge, wall.height,
         THREE.DoubleSide, fillerColor));
-
+*/
       // sides
       planes.push(buildSideFillter(
         edge.interiorStart(), edge.exteriorStart(),
@@ -219,36 +257,62 @@ import { Utils } from "../core/utils";
         shape.holes.push(new THREE.Path(holePoints));
       });
 
-      var geometry = new THREE.ShapeGeometry(shape);
-
+      var geometry:THREE.BufferGeometry = new THREE.ShapeGeometry(shape);
+      let vertices = geometry.getAttribute("position");
+      let tVertex = new THREE.Vector3();
+      for(let i = 0; i < vertices.count; i++) {
+        tVertex.fromBufferAttribute(vertices, i);
+        tVertex.applyMatrix4(invTransform);
+        vertices.setXYZ(i, tVertex.x, tVertex.y, tVertex.z);
+      }
+      /* check above logic replacement
       geometry.vertices.forEach((v) => {
         v.applyMatrix4(invTransform);
       });
+      */
 
       // make UVs
       var totalDistance = Utils.distance(v1.x, v1.z, v2.x, v2.z);
       var height = wall.height;
-      geometry.faceVertexUvs[0] = [];
+//      geometry.faceVertexUvs[0] = [];
 
       function vertexToUv(vertex) {
         var x = Utils.distance(v1.x, v1.z, vertex.x, vertex.z) / totalDistance;
         var y = vertex.y / height;
         return new THREE.Vector2(x, y);
       }
+      let vertA = new THREE.Vector3();
+      let vertB = new THREE.Vector3();
+      let vertC = new THREE.Vector3();
+      let uvA;
+      let uvB;
+      let uvC;
 
-      geometry.faces.forEach((face) => {
-        var vertA = geometry.vertices[face.a];
-        var vertB = geometry.vertices[face.b];
-        var vertC = geometry.vertices[face.c];
-        geometry.faceVertexUvs[0].push([
+      let pos = geometry.getAttribute("position");
+      let uvs = geometry.getAttribute("uv");
+      if(!geometry.index) {
+
+        for(let i = 0; i < geometry.attributes.position.count; i+= 3) {
+          vertA.fromBufferAttribute(pos, i);
+          vertB.fromBufferAttribute(pos, i + 1);
+          vertC.fromBufferAttribute(pos, i + 2);  
+          uvA = vertexToUv(vertA);
+          uvB = vertexToUv(vertB);
+          uvC = vertexToUv(vertC);
+          uvs.setXY(i, uvA.x, uvA.y);
+          uvs.setXY(i + 1, uvB.x, uvB.y);
+          uvs.setXY(i + 2, uvC.x, uvC.y);
+/* check logic        uvs.setXY(i, v geometry.faceVertexUvs[0].push([
           vertexToUv(vertA),
           vertexToUv(vertB),
           vertexToUv(vertC)]);
-      });
+        }); 
 
-      geometry.faceVertexUvs[1] = geometry.faceVertexUvs[0];
+        geometry.faceVertexUvs[1] = geometry.faceVertexUvs[0];
 
-      geometry.computeFaceNormals();
+        geometry.computeFaceNormals(); */
+        };
+      }
       geometry.computeVertexNormals();
 
       var mesh = new THREE.Mesh(
@@ -258,60 +322,11 @@ import { Utils } from "../core/utils";
       return mesh;
     }
 
-    function buildSideFillter(p1, p2, height, color) {
-      var points = [
-        toVec3(p1),
-        toVec3(p2),
-        toVec3(p2, height),
-        toVec3(p1, height)
-      ];
-
-      var geometry = new THREE.Geometry();
-      points.forEach((p) => {
-        geometry.vertices.push(p);
-      });
-      geometry.faces.push(new THREE.Face3(0, 1, 2));
-      geometry.faces.push(new THREE.Face3(0, 2, 3));
-
-      var fillerMaterial = new THREE.MeshBasicMaterial({
-        color: color,
-        side: THREE.DoubleSide
-      });
-
-      var filler = new THREE.Mesh(geometry, fillerMaterial);
-      return filler;
-    }
-
-    function buildFiller(edge, height, side, color) {
-      var points = [
-        toVec2(edge.exteriorStart()),
-        toVec2(edge.exteriorEnd()),
-        toVec2(edge.interiorEnd()),
-        toVec2(edge.interiorStart())
-      ];
-
-      var fillerMaterial = new THREE.MeshBasicMaterial({
-        color: color,
-        side: side
-      });
-
-      var shape = new THREE.Shape(points);
-      var geometry = new THREE.ShapeGeometry(shape);
-
-      var filler = new THREE.Mesh(geometry, fillerMaterial);
-      filler.rotation.set(Math.PI / 2, 0, 0);
-      filler.position.y = height;
-      return filler;
-    }
 
     function toVec2(pos) {
       return new THREE.Vector2(pos.x, pos.y);
     }
 
-    function toVec3(pos, height?) {
-      height = height || 0;
-      return new THREE.Vector3(pos.x, height, pos.y);
-    }
 
     init();
-  }
+}

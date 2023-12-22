@@ -1,11 +1,11 @@
 /// <reference path="../../lib/jQuery.d.ts" />
 import * as THREE from 'three'
 
-import { Corner } from "./corner.ts"
-import { Wall } from "./wall.ts"
-import { Utils } from "../core/utils.ts";
-import { Room } from "./room.ts";
-import { HalfEdge } from "./half_edge.ts";
+import { Corner } from "./corner"
+import { Wall } from "./wall"
+import { Utils } from "../core/utils";
+import { Room } from "./room";
+import { HalfEdge } from "./half_edge";
 
 /** */
   const defaultFloorPlanTolerance = 10.0;

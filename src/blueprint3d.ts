@@ -1,10 +1,12 @@
 import { Floorplanner } from "./floorplanner/floorplanner";
-import  { Model }  from "./model/model.ts";
+import  { Model }  from "./model/model";
 import { Main } from "./three/main";
+
 
   /** Startup options. */
   export interface Options {
     /** */
+    t?;
     widget?: boolean;
 
     /** */
@@ -44,3 +46,5 @@ import { Main } from "./three/main";
     }
   }
 
+  export{ Floorplanner as Floorplanner } from './floorplanner/floorplanner';
+  

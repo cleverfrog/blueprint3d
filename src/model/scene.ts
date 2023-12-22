@@ -1,11 +1,11 @@
 import * as THREE from 'three'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 /// <reference path="../../lib/jQuery.d.ts" />
-import { GLTFLoader } from "../../lib/GLTFLoader.js";
 
-import { Factory } from "../items/factory.ts";
-import { Item } from "../items/item.ts"
-import { Model } from "../model/model.ts";
-import { Utils } from "../core/utils.ts"
+import { Factory } from "../items/factory";
+import { Item } from "../items/item"
+import { Model } from "../model/model";
+import { Utils } from "../core/utils"
   /**
    * The Scene is a manager of Items and also links to a ThreeJS scene.
    */
@@ -96,12 +96,14 @@ import { Utils } from "../core/utils.ts"
      * @param item The item to be removed.
      * @param dontRemove If not set, also remove the item from the items list.
      */
+//    ChangedForR159
     public removeItem(item: Item, dontRemove?: boolean) {
+//
       dontRemove = dontRemove || false;
       // use this for item meshes
       this.itemRemovedCallbacks.fire(item);
       item.removed();
-      this.scene.remove(item);
+      this.scene.remove(<any>item);
       if (!dontRemove) {
         Utils.removeValue(this.items, item);
       }
@@ -120,11 +122,25 @@ import { Utils } from "../core/utils.ts"
     public addItem(itemType: number, fileName: string, metadata, position: THREE.Vector3, rotation: number, scale: THREE.Vector3, fixed: boolean) {
       itemType = itemType || 1;
       var scope = this;
-      var loaderCallback = function (geometry: THREE.Geometry, materials: THREE.Material[]) {
+      // Below allows for extracting single mesh from sketchfab hierarchy
+      var loaderCallback = function (data: any) {
+          let mesh;
+          if(data.scene.children[0].type === "Mesh") {
+            mesh = data.scene.children[0];              
+          }
+          else {
+              data.scene.children[0].traverse(function (tObj) {
+                if(tObj.type === "Mesh") {
+                    mesh = tObj;
+                  return;
+                }
+              });              
+          }
+          
         var item = new (Factory.getClass(itemType))(
           scope.model,
-          metadata, geometry,
-          new THREE.MeshFaceMaterial(materials),
+          metadata, mesh.geometry,
+          mesh.material,
           position, rotation, scale
         );
         item.fixed = fixed || false;

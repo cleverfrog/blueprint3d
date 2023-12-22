@@ -6,7 +6,7 @@ import { WallItem } from "./wall_item";
 
   /** */
   export abstract class WallFloorItem extends WallItem {
-    constructor(model: Model, metadata: Metadata, geometry: THREE.Geometry, material: THREE.MeshFaceMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
+    constructor(model: Model, metadata: Metadata, geometry: THREE.BufferGeometry, material: THREE.MeshStandardMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
       super(model, metadata, geometry, material, position, rotation, scale);
       this.boundToFloor = true;
     };

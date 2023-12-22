@@ -6,7 +6,7 @@ import { Floorplan } from "./floorPlan";
 import { HUD } from "./hud";
 import { Lights } from "./lights";
 import { Skybox } from "./skybox";
-import * as THREE from "../../libs/r159/three.module.js"
+import * as THREE from 'three';
 
   export var Main = function (model, element, canvasElement, opts) {
     var scope = this;
@@ -64,7 +64,8 @@ import * as THREE from "../../libs/r159/three.module.js"
     this.nothingClicked = $.Callbacks();
 
     function init() {
-      THREE.ImageUtils.crossOrigin = "";
+      // ImageUtils no longer exists in r159 - but perhaps this needs to be set elsewhere?
+//      THREE.ImageUtils.crossOrigin = "";
 
       domElement = scope.element.get(0) // Container
       camera = new THREE.PerspectiveCamera(45, 1, 1, 10000);

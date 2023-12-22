@@ -295,3 +295,4 @@ import { FloorplannerView, floorplannerModes } from "./floorplanner_view";
       return (y - this.originY * this.cmPerPixel) * this.pixelsPerCm;
     }
   }
+export { floorplannerModes as floorplannerModes };

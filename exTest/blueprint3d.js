@@ -1,1 +1,0 @@
-(()=>{var e;!function(e){e.Blueprint3d=function(n){this.model=new e.Model.Model(n.textureDir),this.three=new e.Three.Main(this.model,n.threeElement,n.threeCanvasElement,{}),n.widget?this.three.getController().enabled=!1:this.floorplanner=new e.Floorplanner.Floorplanner(n.floorplannerElement,this.model.floorplan)}}(e||(e={}))})();

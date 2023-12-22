@@ -12,3 +12,6 @@ doc
 dist
 example/js/blueprint3d.js
 example/js/three.min.js
+exTest/js/*
+exTest/blueprint3d*
+exTest/index.html

@@ -27,6 +27,18 @@ $(document).ready(function() {
       "type" : "1"
     }, 
     {
+      "name" : "Rusty Wheelbarrow",
+      "image" : "models/thumbnails/thumbnail_ekero-blue3.png",
+      "model" : "models/glb/rusty_wheelbarrow.glb",
+      "type" : "1"
+    },
+    {
+      "name" : "Bookcase",
+      "image" : "models/thumbnails/thumbnail_ekero-blue3.png",
+      "model" : "models/glb/bookcase_2.glb",
+      "type" : "1"
+    },
+    {
       "name" : "Red Chair",
       "image" : "models/thumbnails/thumbnail_tn-orange.png",
       "model" : "models/glb/ik-ekero-orange_baked.glb",

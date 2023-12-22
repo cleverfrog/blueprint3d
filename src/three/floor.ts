@@ -28,7 +28,7 @@ import * as THREE from 'three'
     function buildFloor() {
       var textureSettings = scope.room.getTexture();
       // setup texture
-      var floorTexture = THREE.ImageUtils.loadTexture(textureSettings.url);
+      var floorTexture = new THREE.TextureLoader().load(textureSettings.url);
       floorTexture.wrapS = THREE.RepeatWrapping;
       floorTexture.wrapT = THREE.RepeatWrapping;
       floorTexture.repeat.set(1, 1);

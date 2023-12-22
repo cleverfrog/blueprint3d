@@ -1,10 +1,10 @@
 import * as THREE from 'three'
 /// <reference path="../../lib/jQuery.d.ts" />
 
-import { Corner } from "./corner.ts"
+import { Corner } from "./corner"
 import { Floorplan } from "./floorplan";
-import { Utils } from "../core/utils.ts";
-import { HalfEdge } from "./half_edge.ts";
+import { Utils } from "../core/utils";
+import { HalfEdge } from "./half_edge";
 
 /*
 TODO

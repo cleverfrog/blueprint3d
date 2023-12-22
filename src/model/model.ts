@@ -1,8 +1,8 @@
 import * as THREE from 'three'
 /// <reference path="../../lib/jQuery.d.ts" />
 
-import { Floorplan } from "./floorplan.ts";
-import { Scene } from "./scene.ts";
+import { Floorplan } from "./floorplan";
+import { Scene } from "./scene";
 
 
   export class Model {

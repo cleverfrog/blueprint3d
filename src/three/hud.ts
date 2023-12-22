@@ -89,13 +89,8 @@ import * as THREE from 'three'
     }
 
     function makeLineGeometry(item) {
-      var geometry = new THREE.Geometry();
-
-      geometry.vertices.push(
-        new THREE.Vector3(0, 0, 0),
-        rotateVector(item)
-      );
-
+      let points = [new THREE.Vector3(0, 0, 0), rotateVector(item)];
+      var geometry = new THREE.BufferGeometry().setFromPoints(points);
       return geometry;
     }
 
@@ -137,10 +132,9 @@ import * as THREE from 'three'
 
     function makeObject(item) {
       var object = new THREE.Object3D();
-      var line = new THREE.Line(
+      var line = new THREE.LineSegments(
         makeLineGeometry(item),
-        makeLineMaterial(scope.rotating),
-        THREE.LinePieces);
+        makeLineMaterial(scope.rotating));
 
       var cone = makeCone(item);
       var sphere = makeSphere(item);

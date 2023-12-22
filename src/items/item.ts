@@ -1,13 +1,18 @@
 import * as THREE from 'three'
 
-import { Model } from '../model/model.ts';
-import { Utils } from '../core/utils.ts';
-import { Scene } from '../model/scene.ts';
-import { Metadata } from "./metadata.ts";
+import { Model } from '../model/model';
+import { Utils } from '../core/utils';
+import { Scene } from '../model/scene';
+import { Metadata } from "./metadata";
   /**
    * An Item is an abstract entity for all things placed in the scene,
    * e.g. at walls or on the floor.
    */
+
+  const isMaterialArray = (obj: THREE.Material | THREE.Material[]): obj is THREE.Material[] => {
+    return ((obj as THREE.Material[]).length !== undefined);
+  }
+
   export abstract class Item extends THREE.Mesh {
 
     /** */
@@ -90,7 +95,7 @@ import { Metadata } from "./metadata.ts";
 
       // center in its boundingbox
       this.geometry.computeBoundingBox();
-      this.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(
+      this.geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(
         - 0.5 * (this.geometry.boundingBox.max.x + this.geometry.boundingBox.min.x),
         - 0.5 * (this.geometry.boundingBox.max.y + this.geometry.boundingBox.min.y),
         - 0.5 * (this.geometry.boundingBox.max.z + this.geometry.boundingBox.min.z)
@@ -108,7 +113,7 @@ import { Metadata } from "./metadata.ts";
     };
 
     /** */
-    public remove() {
+    public removeThisItem() {
       this.scene.removeItem(this);
     };
 
@@ -172,10 +177,13 @@ import { Metadata } from "./metadata.ts";
       var on = this.hover || this.selected;
       this.highlighted = on;
       var hex = on ? this.emissiveColor : 0x000000;
-      (<THREE.MeshStandardMaterial>this.material).forEach((material) => {
-        // TODO_Ekki emissive doesn't exist anymore?
-        (<any>material).emissive.setHex(hex);
-      });
+      // this seems to have been broken anyway - but we need to refactor this for ThreeR159
+      if(isMaterialArray(this.material)) {
+/*        for(<THREE.MeshStandardMaterial>this.material).forEach((material) => {
+          // TODO_Ekki emissive doesn't exist anymore?
+          (<any>material).emissive.setHex(hex);
+        } )*/;
+    }
     }
 
     /** */
@@ -331,7 +339,8 @@ import { Metadata } from "./metadata.ts";
     /** */
     private objectHalfSize(): THREE.Vector3 {
       var objectBox = new THREE.Box3();
-      objectBox.setFromObject(this);
+      objectBox.setFromObject(<any>this);
+      // check logic of typing this 'any'
       return objectBox.max.clone().sub(objectBox.min).divideScalar(2);
     }
 
@@ -347,7 +356,7 @@ import { Metadata } from "./metadata.ts";
         depthTest: !ignoreDepth
       });
 
-      var glow = new THREE.Mesh(<THREE.Geometry>this.geometry.clone(), glowMaterial);
+      var glow = new THREE.Mesh(<THREE.BufferGeometry>this.geometry.clone(), glowMaterial);
       glow.position.copy(this.position);
       glow.rotation.copy(this.rotation);
       glow.scale.copy(this.scale);

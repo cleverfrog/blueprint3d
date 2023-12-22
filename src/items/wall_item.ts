@@ -43,7 +43,7 @@ import { Metadata } from "./metadata";
     /** */
     protected backVisible = false;
 
-    constructor(model: Model, metadata: Metadata, geometry: THREE.Geometry, material: THREE.MeshFaceMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
+    constructor(model: Model, metadata: Metadata, geometry: THREE.BufferGeometry, material: THREE.MeshStandardMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
       super(model, metadata, geometry, material, position, rotation, scale);
 
       this.allowRotate = false;
@@ -166,10 +166,11 @@ import { Metadata } from "./metadata";
 
       // find angle between wall normals
       var normal2 = new THREE.Vector2();
+/* needs logic change
       var normal3 = wallEdge.plane.geometry.faces[0].normal;
       normal2.x = normal3.x;
       normal2.y = normal3.z;
-
+*/
       var angle = Utils.angle(
         this.refVec.x, this.refVec.y,
         normal2.x, normal2.y);

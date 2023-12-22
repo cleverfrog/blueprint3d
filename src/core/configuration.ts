@@ -1,4 +1,5 @@
-import { dimInch } from "./dimensioning";
+//import { dimInch } from "./dimensioning";
+export const dimInch: string = "inch";
 
 
   // GENERAL:

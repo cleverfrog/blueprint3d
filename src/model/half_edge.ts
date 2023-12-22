@@ -1,9 +1,9 @@
 import * as THREE from 'three'
 /// <reference path="../../lib/jQuery.d.ts" />
 
-import { Room } from "../model/room.ts";
-import { Utils } from "../core/utils.ts";
-import { Wall } from "../model/wall.ts";
+import { Room } from "../model/room";
+import { Utils } from "../core/utils";
+import { Wall } from "../model/wall";
   /**
    * Half Edges are created by Room.
    * 
@@ -106,12 +106,15 @@ import { Wall } from "../model/wall.ts";
       var v4 = v1.clone();
       v4.y = this.wall.height;
 
-      var geometry = new THREE.Geometry();
-      geometry.vertices = [v1, v2, v3, v4];
-
+      var geometry = new THREE.BufferGeometry().setFromPoints( [v1, v2, v3, v4]);
+      let indices = new Uint16Array([0, 1, 2, 0, 2, 3]);
+      geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+      /* ChangedForR159 - check logic replacement 
       geometry.faces.push(new THREE.Face3(0, 1, 2));
       geometry.faces.push(new THREE.Face3(0, 2, 3));
+      
       geometry.computeFaceNormals();
+      */
       geometry.computeBoundingBox();
 
       this.plane = new THREE.Mesh(geometry,
@@ -145,7 +148,10 @@ import { Wall } from "../model/wall.ts";
       var tr = new THREE.Matrix4();
       tr.makeRotationY(-angle);
       transform.multiplyMatrices(tr, tt);
-      invTransform.getInverse(transform);
+      //ChangedForR159
+      invTransform.copy(transform);
+      invTransform.invert();
+      //
     }
 
     /** Gets the distance from specified point.

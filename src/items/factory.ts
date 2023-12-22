@@ -1,6 +1,6 @@
-import { FloorItem } from "./floor_item.ts";
-import { WallItem } from "./wall_item.ts";
-import { InWallItem } from "./in_wall_item.ts"
+import { FloorItem } from "./floor_item";
+import { WallItem } from "./wall_item";
+import { InWallItem } from "./in_wall_item"
 import { InWallFloorItem } from "./in_wall_floor_item";
 import { OnFloorItem } from "./on_floor_item";
 import { WallFloorItem } from "./wall_floor_item";

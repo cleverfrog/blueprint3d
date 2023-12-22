@@ -374,7 +374,7 @@ import { Utils } from "../core/utils";
       var raycaster = new THREE.Raycaster(
         camera.position,
         direction);
-      raycaster.linePrecision = linePrecision;
+      raycaster.params.Mesh.precision = linePrecision;
       var intersections;
       if (objects instanceof Array) {
         intersections = raycaster.intersectObjects(objects, recursive);

@@ -27,9 +27,18 @@ To get started, clone the repository and ensure you npm >= 3 and grunt installed
     npm install
     grunt
 
+NOTE: This has been updated to utilize webpack.
+To get started run:
+    npm install
+    npm run-script build
+
 The latter command generates `example/js/blueprint3d.js` from `src`.
 
-The easiest way to run locally is to run a local server from the `example` directory. There are plenty of options. One uses Python's built in webserver:
+The easiest way to run this locally would be to use php.  
+    cd example
+    php -S localhost:8000
+
+The other easiest way to run locally is to run a local server from the `example` directory. There are plenty of options. One uses Python's built in webserver:
 
     cd example
 
@@ -57,7 +66,7 @@ Please contact us if you are interested in contributing.
 - Better use of npm conventions and packaging
 - Various bug fixes
 - refactor three/* - use of classes, lambdas
-- update to current threejs
+- update to current threejs -- COMPLETE!  to R159
 - introduce a more formal persistency format
 - put all relevant settings into Core.Configuration to make them read-/writeable, User settings?
 - complete type docs for all entities
@@ -94,3 +103,8 @@ This project is open-source! See LICENSE.txt for more information.
 
 npm install -g typescript
 npm install -D webpack webpack-cli ts-loader webpack-dev-server
+
+
+nvm install v14.16.1
+npm install -g grunt-cli
+npm install grunt
