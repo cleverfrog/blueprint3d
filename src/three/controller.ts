@@ -1,11 +1,12 @@
 /// <reference path="../../lib/jQuery.d.ts" />
-/// <reference path="../../lib/three.d.ts" />
-/// <reference path="../core/utils.ts" />
+import * as THREE from 'three'
 
-module BP3D.Three {
+import { Utils } from "../core/utils";
+
   export var Controller = function (three, model, camera, element, controls, hud) {
 
     var scope = this;
+    var raycaster = new THREE.Raycaster();
 
     this.enabled = true;
 
@@ -13,6 +14,9 @@ module BP3D.Three {
     var model = model;
     var scene = model.scene;
     var element = element;
+//    var nonJQueryElement = element[0];
+    var nonJQueryElement;
+
     var camera = camera;
     var controls = controls;
     var hud = hud;
@@ -23,7 +27,7 @@ module BP3D.Three {
     var intersectedObject;
     var mouseoverObject;
     var selectedObject;
-
+    this.clearState;
     var mouseDown = false;
     var mouseMoved = false; // has mouse moved since down click
 
@@ -42,6 +46,8 @@ module BP3D.Three {
     this.needsUpdate = true;
 
     function init() {
+      nonJQueryElement = document.getElementById("three-canvas");
+
       element.mousedown(mouseDownEvent);
       element.mouseup(mouseUpEvent);
       element.mousemove(mouseMoveEvent);
@@ -135,14 +141,17 @@ module BP3D.Three {
 
     }
 
+    function setMouse(e, m) {
+        mouse.x = (e.offsetX / nonJQueryElement.clientWidth ) * 2 - 1;
+        mouse.y = -(e.offsetY / nonJQueryElement.clientHeight ) * 2 + 1;
+//        return x; //e.offsetX - rect.left; 
+    }
     function mouseMoveEvent(event) {
       if (scope.enabled) {
         event.preventDefault();
 
         mouseMoved = true;
-
-        mouse.x = event.clientX;
-        mouse.y = event.clientY;
+        setMouse(event, mouse);
 
         if (!mouseDown) {
           updateIntersections();
@@ -212,8 +221,14 @@ module BP3D.Three {
 
         switch (state) {
           case states.DRAGGING:
-            selectedObject.clickReleased();
-            switchState(states.SELECTED);
+            if(!selectedObject) {
+              switchState(states.UNSELECTED); // not sure why this can't happen upon item deletion - but in some 
+                                              // cases it fails to fire.  Maybe a jquery callback issue when the window loses focus?
+            }
+            else {
+              selectedObject.clickReleased();
+              switchState(states.SELECTED);
+            }
             break;
           case states.ROTATING:
             if (!mouseMoved) {
@@ -238,7 +253,6 @@ module BP3D.Three {
         }
       }
     }
-
     function switchState(newState) {
       if (newState != state) {
         onExit(state);
@@ -248,6 +262,10 @@ module BP3D.Three {
       hud.setRotating(scope.isRotating());
     }
 
+    this.clearState = function() {
+      switchState(states.UNSELECTED)
+    }
+    
     function onEntry(state) {
       switch (state) {
         case states.UNSELECTED:
@@ -316,12 +334,22 @@ module BP3D.Three {
       var intersects = scope.getIntersections(
         mouse,
         items,
-        false, true);
+        false, true, true);
 
       if (intersects.length > 0) {
         intersectedObject = intersects[0].object;
       } else {
         intersectedObject = null;
+      }
+
+      if(intersectedObject) {
+        while(!intersectedObject.isBP3DItem) {
+          intersectedObject = intersectedObject.parent;
+          if(intersectedObject.type === "Scene") {
+            intersectedObject = null;
+            break;
+          }
+        }
       }
     }
 
@@ -332,10 +360,11 @@ module BP3D.Three {
       retVec.y = -((vec2.y - three.heightMargin) / (window.innerHeight - three.heightMargin)) * 2 + 1;
       return retVec;
     }
-
+//    ( ( event.clientX - canvasBounds.left ) / ( canvasBounds.right - canvasBounds.left ) ) * 2 - 1;
     //
     function mouseToVec3(vec2) {
-      var normVec2 = normalizeVector2(vec2)
+     // var normVec2 = normalizeVector2(vec2)
+      var normVec2 = vec2;
       var vector = new THREE.Vector3(
         normVec2.x, normVec2.y, 0.5);
       vector.unproject(camera);
@@ -361,7 +390,12 @@ module BP3D.Three {
     // filter by normals will only return objects facing the camera
     // objects can be an array of objects or a single object
     this.getIntersections = function (vec2, objects, filterByNormals, onlyVisible, recursive, linePrecision) {
-
+/*
+      var x = this.__mouse.x = ( e.offsetX / this.__renderer.domElement.clientWidth ) * 2 - 1;
+      var y = this.__mouse.y =  - ( e.offsetY / this.__renderer.domElement.clientHeight ) * 2 + 1;
+  
+      this.__raycaster.setFromCamera( {x: x, y: y}, this.__camera );
+      */
       var vector = mouseToVec3(vec2);
 
       onlyVisible = onlyVisible || false;
@@ -370,11 +404,12 @@ module BP3D.Three {
       linePrecision = linePrecision || 20;
 
 
+ //     raycaster.setFromCamera(vec2, camera)
       var direction = vector.sub(camera.position).normalize();
       var raycaster = new THREE.Raycaster(
         camera.position,
-        direction);
-      raycaster.linePrecision = linePrecision;
+        direction); 
+      raycaster.params.Mesh.precision = linePrecision;
       var intersections;
       if (objects instanceof Array) {
         intersections = raycaster.intersectObjects(objects, recursive);
@@ -383,14 +418,14 @@ module BP3D.Three {
       }
       // filter by visible, if true
       if (onlyVisible) {
-        intersections = Core.Utils.removeIf(intersections, function (intersection) {
+        intersections = Utils.removeIf(intersections, function (intersection) {
           return !intersection.object.visible;
         });
       }
 
       // filter by normals, if true
       if (filterByNormals) {
-        intersections = Core.Utils.removeIf(intersections, function (intersection) {
+        intersections = Utils.removeIf(intersections, function (intersection) {
           var dot = intersection.face.normal.dot(direction);
           return (dot > 0)
         });
@@ -445,4 +480,4 @@ module BP3D.Three {
 
     init();
   }
-}
+

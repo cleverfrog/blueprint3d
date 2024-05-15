@@ -1,4 +1,3 @@
-module BP3D.Items {
   /** Meta data for items. */
   export interface Metadata {
     /** Name of the item. */
@@ -12,5 +11,6 @@ module BP3D.Items {
 
     /** Resizeable or not */
     resizable?: boolean;
+
+    geometryScale: number;
   }
-}

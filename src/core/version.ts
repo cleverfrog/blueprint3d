@@ -1,4 +1,3 @@
-module BP3D.Core {
   /** Version information. */
   export class Version {
     /** The informal version. */
@@ -11,7 +10,7 @@ module BP3D.Core {
       return "1.0.0.1"
     }
   }
-}
 
-console.log("Blueprint3D " + BP3D.Core.Version.getInformalVersion()
-  + " (" + BP3D.Core.Version.getTechnicalVersion() + ")")
+
+console.log("Blueprint3D " + Version.getInformalVersion()
+  + " (" + Version.getTechnicalVersion() + ")")

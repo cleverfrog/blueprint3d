@@ -1,17 +1,17 @@
-/// <reference path="../../lib/three.d.ts" />
-/// <reference path="../core/utils.ts" />
-/// <reference path="../model/half_edge.ts" />
-/// <reference path="../model/model.ts" />
-/// <reference path="item.ts" />
-/// <reference path="metadata.ts" />
+import * as THREE from 'three'
 
-namespace BP3D.Items {
+import { Utils } from "../core/utils";
+import { HalfEdge } from "../model/half_edge";
+import { Model } from "../model/model";
+import { Item } from "./item";
+import { Metadata } from "./metadata";
+
   /**
    * A Wall Item is an entity to be placed related to a wall.
    */
   export abstract class WallItem extends Item {
     /** The currently applied wall edge. */
-    protected currentWallEdge: Model.HalfEdge = null;
+    protected currentWallEdge: HalfEdge = null;
     /* TODO:
        This caused a huge headache.
        HalfEdges get destroyed/created every time floorplan is edited.
@@ -43,8 +43,8 @@ namespace BP3D.Items {
     /** */
     protected backVisible = false;
 
-    constructor(model: Model.Model, metadata: Metadata, geometry: THREE.Geometry, material: THREE.MeshFaceMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
-      super(model, metadata, geometry, material, position, rotation, scale);
+    constructor(model: Model, metadata: Metadata, geometries: THREE.BufferGeometry[], materials: THREE.MeshStandardMaterial[], root: THREE.Object3D, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
+      super(model, metadata, geometries, materials, root,  position, rotation, scale);
 
       this.allowRotate = false;
     };
@@ -52,7 +52,7 @@ namespace BP3D.Items {
     /** Get the closet wall edge.
      * @returns The wall edge.
      */
-    public closestWallEdge(): Model.HalfEdge {
+    public closestWallEdge(): HalfEdge {
 
       var wallEdges = this.model.floorplan.wallEdges();
 
@@ -62,7 +62,7 @@ namespace BP3D.Items {
       var itemX = this.position.x;
       var itemZ = this.position.z;
 
-      wallEdges.forEach((edge: Model.HalfEdge) => {
+      wallEdges.forEach((edge: HalfEdge) => {
         var distance = edge.distanceTo(itemX, itemZ);
         if (minDistance === null || distance < minDistance) {
           minDistance = distance;
@@ -76,7 +76,7 @@ namespace BP3D.Items {
     /** */
     public removed() {
       if (this.currentWallEdge != null && this.addToWall) {
-        Core.Utils.removeValue(this.currentWallEdge.wall.items, this);
+        Utils.removeValue(this.currentWallEdge.wall.items, this);
         this.redrawWall();
       }
     }
@@ -100,15 +100,15 @@ namespace BP3D.Items {
 
     /** */
     private updateSize() {
-      this.wallOffsetScalar = (this.geometry.boundingBox.max.z - this.geometry.boundingBox.min.z) * this.scale.z / 2.0;
-      this.sizeX = (this.geometry.boundingBox.max.x - this.geometry.boundingBox.min.x) * this.scale.x;
-      this.sizeY = (this.geometry.boundingBox.max.y - this.geometry.boundingBox.min.y) * this.scale.y;
+      this.wallOffsetScalar = (this.boundingBox.max.z - this.boundingBox.min.z) * this.scale.z / 2.0;
+      this.sizeX = (this.boundingBox.max.x - this.boundingBox.min.x) * this.scale.x;
+      this.sizeY = (this.boundingBox.max.y - this.boundingBox.min.y) * this.scale.y;
     }
 
     /** */
     public resized() {
       if (this.boundToFloor) {
-        this.position.y = 0.5 * (this.geometry.boundingBox.max.y - this.geometry.boundingBox.min.y) * this.scale.y + 0.01;
+        this.position.y = 0.5 * (this.boundingBox.max.y - this.boundingBox.min.y) * this.scale.y + 0.01;
       }
 
       this.updateSize();
@@ -151,10 +151,10 @@ namespace BP3D.Items {
     private changeWallEdge(wallEdge) {
       if (this.currentWallEdge != null) {
         if (this.addToWall) {
-          Core.Utils.removeValue(this.currentWallEdge.wall.items, this);
+          Utils.removeValue(this.currentWallEdge.wall.items, this);
           this.redrawWall();
         } else {
-          Core.Utils.removeValue(this.currentWallEdge.wall.onItems, this);
+          Utils.removeValue(this.currentWallEdge.wall.onItems, this);
         }
       }
 
@@ -166,11 +166,14 @@ namespace BP3D.Items {
 
       // find angle between wall normals
       var normal2 = new THREE.Vector2();
-      var normal3 = wallEdge.plane.geometry.faces[0].normal;
+      // changed for R159
+      // var normal3 = wallEdge.plane.geometry.faces[0].normal;
+      // changed
+      let normal3 = Utils.getNormalFromGeometry(wallEdge.plane.geometry, 0);
       normal2.x = normal3.x;
       normal2.y = normal3.z;
 
-      var angle = Core.Utils.angle(
+      var angle = Utils.angle(
         this.refVec.x, this.refVec.y,
         normal2.x, normal2.y);
       this.rotation.y = angle;
@@ -204,7 +207,7 @@ namespace BP3D.Items {
       }
 
       if (this.boundToFloor) {
-        vec3.y = 0.5 * (this.geometry.boundingBox.max.y - this.geometry.boundingBox.min.y) * this.scale.y + 0.01;
+        vec3.y = 0.5 * (this.boundingBox.max.y - this.boundingBox.min.y) * this.scale.y + 0.01;
       } else {
         if (vec3.y < this.sizeY / 2.0 + tolerance) {
           vec3.y = this.sizeY / 2.0 + tolerance;
@@ -218,4 +221,3 @@ namespace BP3D.Items {
       vec3.applyMatrix4(edge.invInteriorTransform);
     }
   }
-}

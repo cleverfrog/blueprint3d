@@ -1,19 +1,18 @@
-/// <reference path="floor_item.ts" />
-/// <reference path="in_wall_floor_item.ts" />
-/// <reference path="in_wall_item.ts" />
-/// <reference path="on_floor_item.ts" />
-/// <reference path="wall_floor_item.ts" />
-/// <reference path="wall_item.ts" />
+import { FloorItem } from "./floor_item";
+import { WallItem } from "./wall_item";
+import { InWallItem } from "./in_wall_item"
+import { InWallFloorItem } from "./in_wall_floor_item";
+import { OnFloorItem } from "./on_floor_item";
+import { WallFloorItem } from "./wall_floor_item";
 
-module BP3D.Items {
-  /** Enumeration of item types. */
+/** Enumeration of item types. */
   const item_types = {
-    1: Items.FloorItem,
-    2: Items.WallItem,
-    3: Items.InWallItem,
-    7: Items.InWallFloorItem,
-    8: Items.OnFloorItem,
-    9: Items.WallFloorItem
+    1: FloorItem,
+    2: WallItem,
+    3: InWallItem,
+    7: InWallFloorItem,
+    8: OnFloorItem,
+    9: WallFloorItem
   };
 
   /** Factory class to create items. */
@@ -23,4 +22,3 @@ module BP3D.Items {
       return item_types[itemType]
     }
   }
-}

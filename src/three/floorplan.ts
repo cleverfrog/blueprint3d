@@ -1,8 +1,8 @@
-/// <reference path="../../lib/three.d.ts" />
-/// <reference path="floor.ts" />
-/// <reference path="edge.ts" />
+import * as THREE from 'three'
 
-module BP3D.Three {
+import { Edge } from './edge';
+import { Floor } from './floor';
+
   export var Floorplan = function (scene, floorplan, controls) {
 
     var scope = this;
@@ -30,17 +30,16 @@ module BP3D.Three {
 
       // draw floors
      scope.floorplan.getRooms().forEach((room) => {
-        var threeFloor = new Three.Floor(scene, room);
+        var threeFloor = new Floor(scene, room);
         scope.floors.push(threeFloor);
         threeFloor.addToScene();
       });
 
       // draw edges
       scope.floorplan.wallEdges().forEach((edge) => {
-        var threeEdge = new Three.Edge(
+        var threeEdge = new Edge(
           scene, edge, scope.controls);
         scope.edges.push(threeEdge);
       });
     }
   }
-}

@@ -1,13 +1,13 @@
 /// <reference path="../../lib/jQuery.d.ts" />
-/// <reference path="../../lib/three.d.ts" />
-/// <reference path="../core/utils.ts" />
-/// <reference path="wall.ts" />
-/// <reference path="corner.ts" />
-/// <reference path="room.ts" />
-/// <reference path="half_edge.ts" />
+import * as THREE from 'three'
 
-module BP3D.Model {
-  /** */
+import { Corner } from "./corner"
+import { Wall } from "./wall"
+import { Utils } from "../core/utils";
+import { Room } from "./room";
+import { HalfEdge } from "./half_edge";
+
+/** */
   const defaultFloorPlanTolerance = 10.0;
 
   /** 
@@ -81,7 +81,7 @@ module BP3D.Model {
     }
 
     private floorPlanes(): THREE.Mesh[] {
-      return Core.Utils.map(this.rooms, (room: Room) => {
+      return Utils.map(this.rooms, (room: Room) => {
         return room.floorPlane;
       });
     }
@@ -124,7 +124,7 @@ module BP3D.Model {
      * @param wall The wall to be removed.
      */
     private removeWall(wall: Wall) {
-      Core.Utils.removeValue(this.walls, wall);
+      Utils.removeValue(this.walls, wall);
       this.update();
     }
 
@@ -149,7 +149,7 @@ module BP3D.Model {
      * @param corner The corner to be removed.
      */
     private removeCorner(corner: Corner) {
-      Core.Utils.removeValue(this.corners, corner);
+      Utils.removeValue(this.corners, corner);
     }
 
     /** Gets the walls. */
@@ -265,11 +265,11 @@ module BP3D.Model {
 
     /** clear out obsolete floor textures */
     private updateFloorTextures() {
-      var uuids = Core.Utils.map(this.rooms, function (room) {
+      var uuids = Utils.map(this.rooms, function (room) {
         return room.getUuid();
       });
       for (var uuid in this.floorTextures) {
-        if (!Core.Utils.hasValue(uuids, uuid)) {
+        if (!Utils.hasValue(uuids, uuid)) {
           delete this.floorTextures[uuid]
         }
       }
@@ -375,7 +375,7 @@ module BP3D.Model {
     public findRooms(corners: Corner[]): Corner[][] {
 
       function _calculateTheta(previousCorner: Corner, currentCorner: Corner, nextCorner: Corner) {
-        var theta = Core.Utils.angle2pi(
+        var theta = Utils.angle2pi(
           previousCorner.x - currentCorner.x,
           previousCorner.y - currentCorner.y,
           nextCorner.x - currentCorner.x,
@@ -395,8 +395,8 @@ module BP3D.Model {
           var add = true;
           var room = roomArray[i];
           for (var j = 0; j < room.length; j++) {
-            var roomShift = Core.Utils.cycle(room, j);
-            var str = Core.Utils.map(roomShift, hashFunc).join(sep);
+            var roomShift = Utils.cycle(room, j);
+            var str = Utils.map(roomShift, hashFunc).join(sep);
             if (lookup.hasOwnProperty(str)) {
               add = false;
             }
@@ -488,9 +488,9 @@ module BP3D.Model {
       // remove duplicates
       var uniqueLoops = _removeDuplicateRooms(loops);
       //remove CW loops
-      var uniqueCCWLoops = Core.Utils.removeIf(uniqueLoops, Core.Utils.isClockwise);
+      var uniqueCCWLoops = Utils.removeIf(uniqueLoops, Utils.isClockwise);
 
       return uniqueCCWLoops;
     }
   }
-}
+

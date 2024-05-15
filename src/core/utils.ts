@@ -1,6 +1,5 @@
-module BP3D.Core {
-
-  /** Collection of utility functions. */
+import * as THREE from 'three';
+/** Collection of utility functions. */
   export class Utils {
 
     /** Determines the distance of a point from a line.
@@ -362,5 +361,26 @@ module BP3D.Core {
         return Utils.hasValue(subArray, el);
       });
     }
+
+    public static getNormalFromGeometry(geometry: THREE.BufferGeometry, index: number)  {
+        let p1 = new THREE.Vector3();
+        let p2 = new THREE.Vector3();
+        let p3 = new THREE.Vector3();
+        let buffAttr = geometry.getAttribute("position");
+        if(geometry.attributes.index) {
+            p1.fromBufferAttribute(buffAttr, geometry.attributes.index[0]);
+            p2.fromBufferAttribute(buffAttr, geometry.attributes.index[1]);
+            p3.fromBufferAttribute(buffAttr, geometry.attributes.index[2]);
+        }
+        else {
+            p1.fromBufferAttribute(buffAttr, 0);
+            p2.fromBufferAttribute(buffAttr, 1);
+            p3.fromBufferAttribute(buffAttr, 2);
+        }
+        let unitVecA = new THREE.Vector3().subVectors(p2, p1).normalize();
+        let unitVecB = new THREE.Vector3().subVectors(p3, p1).normalize();
+        let dir = new THREE.Vector3().crossVectors(unitVecA, unitVecB);
+        return dir.normalize();
+    }
   }
-}
+

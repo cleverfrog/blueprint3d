@@ -1,9 +1,17 @@
-/// <reference path="../../lib/three.d.ts" />
+import * as THREE from 'three'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 /// <reference path="../../lib/jQuery.d.ts" />
-/// <reference path="../core/utils.ts" />
-/// <reference path="../items/factory.ts" />
 
-module BP3D.Model {
+import { Factory } from "../items/factory";
+import { Item } from "../items/item"
+import { Model } from "../model/model";
+import { Utils } from "../core/utils";
+
+declare global {
+	interface Window {
+		scene: THREE.Scene;
+	}
+}
   /**
    * The Scene is a manager of Items and also links to a ThreeJS scene.
    */
@@ -13,13 +21,13 @@ module BP3D.Model {
     private scene: THREE.Scene;
 
     /** */
-    private items: Items.Item[] = [];
+    private items: Item[] = [];
 
     /** */
     public needsUpdate = false;
 
     /** The Json loader. */
-    private loader: THREE.JSONLoader;
+    private loader: GLTFLoader;
 
     /** */
     private itemLoadingCallbacks = $.Callbacks();
@@ -37,9 +45,10 @@ module BP3D.Model {
      */
     constructor(private model: Model, private textureDir: string) {
       this.scene = new THREE.Scene();
+      window.scene = this.scene;
 
       // init item loader
-      this.loader = new THREE.JSONLoader();
+      this.loader = new GLTFLoader();
       this.loader.crossOrigin = "";
     }
 
@@ -55,7 +64,7 @@ module BP3D.Model {
      */
     public remove(mesh: THREE.Mesh) {
       this.scene.remove(mesh);
-      Core.Utils.removeValue(this.items, mesh);
+      Utils.removeValue(this.items, mesh);
     }
 
     /** Gets the scene.
@@ -68,7 +77,7 @@ module BP3D.Model {
     /** Gets the items.
      * @returns The items.
      */
-    public getItems(): Items.Item[] {
+    public getItems(): Item[] {
       return this.items;
     }
 
@@ -94,14 +103,16 @@ module BP3D.Model {
      * @param item The item to be removed.
      * @param dontRemove If not set, also remove the item from the items list.
      */
-    public removeItem(item: Items.Item, dontRemove?: boolean) {
+    //    ChangedForR159 from 'remove'
+    public removeItem(item: Item, dontRemove?: boolean) {
+    //
       dontRemove = dontRemove || false;
       // use this for item meshes
       this.itemRemovedCallbacks.fire(item);
       item.removed();
-      this.scene.remove(item);
+      this.scene.remove(<any>item);
       if (!dontRemove) {
-        Core.Utils.removeValue(this.items, item);
+        Utils.removeValue(this.items, item);
       }
     }
 
@@ -118,16 +129,74 @@ module BP3D.Model {
     public addItem(itemType: number, fileName: string, metadata, position: THREE.Vector3, rotation: number, scale: THREE.Vector3, fixed: boolean) {
       itemType = itemType || 1;
       var scope = this;
-      var loaderCallback = function (geometry: THREE.Geometry, materials: THREE.Material[]) {
-        var item = new (Items.Factory.getClass(itemType))(
+      // Below allows for extracting single mesh from sketchfab hierarchy
+      var loaderCallback = function (data: any) {
+        let mesh;
+        let rootObj;
+        let scaleGeometry = 1;
+        let geometries = [];
+        let materials = [];
+        let children = [];
+        if((data.scene.children[0].type === "Mesh") && (data.scene.children.length === 1)) {
+          rootObj = new THREE.Object3D();
+          rootObj.add(data.scene.children[0]);
+          geometries.push(rootObj.children[0].geometry);
+          materials.push(rootObj.children[0].material);
+        }
+        else {
+          // altered traverse function to allow breaking out of the callback 'loop' with return true'
+          data.scene.traverse(function(tObj) {
+            if(tObj.name.includes("root") || tObj.name.includes("Root")) {
+              rootObj = tObj;
+              return true;
+            }
+          }, true);
+          if(!rootObj)
+            rootObj = data.scene;
+
+          while(rootObj.children.length === 1 && rootObj.children[0].type !== "Mesh") {
+            rootObj = rootObj.children[0];
+          }
+
+            if(metadata.geometryScale) {  // override with scale setting in items.js
+              scaleGeometry = metadata.geometryScale;
+            }
+            else {
+              // room units re ~100 to 1m - i.e. centimeters. So if there's no scaling mentioned, guess on the model being in meters when loaded.
+              scaleGeometry = 100;  
+            }
+			
+            data.scene.children[0].traverse(function (tObj) {
+              if(tObj.type === "Mesh") {
+                geometries.push(tObj.geometry);
+
+                materials.push(tObj.material);
+                tObj.geometry.computeBoundingBox();
+              }
+            });              
+        }
+        // get new root object's global transform to apply to geometry.
+        rootObj.updateWorldMatrix(true);
+        let tMatr = new THREE.Matrix4().copy(rootObj.matrixWorld);
+        if(rootObj.parent) {
+          rootObj.parent.remove(rootObj);
+
+        }
+        for(let g of geometries) {
+          g.applyMatrix4(tMatr);
+          g.scale(scaleGeometry, scaleGeometry, scaleGeometry);
+        }
+        metadata.geometryScale = scaleGeometry;
+        var item = new (Factory.getClass(itemType))(
           scope.model,
-          metadata, geometry,
-          new THREE.MeshFaceMaterial(materials),
+          metadata, geometries,
+          materials, rootObj,
           position, rotation, scale
         );
         item.fixed = fixed || false;
         scope.items.push(item);
         scope.add(item);
+        item.add(item.boundingBoxHelper)
         item.initObject();
         scope.itemLoadedCallbacks.fire(item);
       }
@@ -140,4 +209,19 @@ module BP3D.Model {
       );
     }
   }
-}
+  //@ts-ignore
+  THREE.Object3D.prototype.traverse = function( callback, cancellable ) {
+  
+		if(callback( this) && cancellable)
+      return;
+
+		const children = this.children;
+
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+			if(children[ i ].traverse( callback, true ) && cancellable)
+        return;
+
+		}
+
+	}

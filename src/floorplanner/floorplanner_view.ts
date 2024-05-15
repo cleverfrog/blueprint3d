@@ -1,14 +1,15 @@
 /// <reference path="../../lib/jQuery.d.ts" />
 /// <reference path="../core/configuration.ts" />
-/// <reference path="../core/dimensioning.ts" />
-/// <reference path="../core/utils.ts" />
-/// <reference path="../model/floorplan.ts" />
-/// <reference path="../model/half_edge.ts" />
-/// <reference path="../model/model.ts" />
-/// <reference path="../model/wall.ts" />
-/// <reference path="floorplanner.ts" />
 
-module BP3D.Floorplanner {
+import { Dimensioning } from "../core/dimensioning";
+import { Utils } from "../core/utils";
+import { Corner } from "../model/corner";
+import { Floorplan } from "../model/floorplan";
+import { HalfEdge } from "../model/half_edge";
+import { Room } from "../model/room";
+import { Wall } from "../model/wall";
+import { Floorplanner } from "./floorplanner";
+
   /** */
   export const floorplannerModes = {
     MOVE: 0,
@@ -53,7 +54,7 @@ module BP3D.Floorplanner {
     private context;
 
     /** */
-    constructor(private floorplan: Model.Floorplan, private viewmodel: Floorplanner, private canvas: string) {
+    constructor(private floorplan: Floorplan, private viewmodel: Floorplanner, private canvas: string) {
       this.canvasElement = <HTMLCanvasElement>document.getElementById(canvas);
       this.context = this.canvasElement.getContext('2d');
 
@@ -103,7 +104,7 @@ module BP3D.Floorplanner {
     }
 
     /** */
-    private drawWallLabels(wall: Model.Wall) {
+    private drawWallLabels(wall: Wall) {
       // we'll just draw the shorter label... idk
       if (wall.backEdge && wall.frontEdge) {
         if (wall.backEdge.interiorDistance < wall.frontEdge.interiorDistance) {
@@ -119,7 +120,7 @@ module BP3D.Floorplanner {
     }
 
     /** */
-    private drawWall(wall: Model.Wall) {
+    private drawWall(wall: Wall) {
       var hover = (wall === this.viewmodel.activeWall);
       var color = wallColor;
       if (hover && this.viewmodel.mode == floorplannerModes.DELETE) {
@@ -144,7 +145,7 @@ module BP3D.Floorplanner {
     }
 
     /** */
-    private drawEdgeLabel(edge: Model.HalfEdge) {
+    private drawEdgeLabel(edge: HalfEdge) {
       var pos = edge.interiorCenter();
       var length = edge.interiorDistance();
       if (length < 60) {
@@ -158,16 +159,16 @@ module BP3D.Floorplanner {
       this.context.strokeStyle = "#ffffff";
       this.context.lineWidth = 4;
 
-      this.context.strokeText(Core.Dimensioning.cmToMeasure(length),
+      this.context.strokeText(Dimensioning.cmToMeasure(length),
         this.viewmodel.convertX(pos.x),
         this.viewmodel.convertY(pos.y));
-      this.context.fillText(Core.Dimensioning.cmToMeasure(length),
+      this.context.fillText(Dimensioning.cmToMeasure(length),
         this.viewmodel.convertX(pos.x),
         this.viewmodel.convertY(pos.y));
     }
 
     /** */
-    private drawEdge(edge: Model.HalfEdge, hover) {
+    private drawEdge(edge: HalfEdge, hover) {
       var color = edgeColor;
       if (hover && this.viewmodel.mode == floorplannerModes.DELETE) {
         color = deleteColor;
@@ -178,10 +179,10 @@ module BP3D.Floorplanner {
 
       var scope = this;
       this.drawPolygon(
-        Core.Utils.map(corners, function (corner) {
+        Utils.map(corners, function (corner) {
           return scope.viewmodel.convertX(corner.x);
         }),
-        Core.Utils.map(corners, function (corner) {
+        Utils.map(corners, function (corner) {
           return scope.viewmodel.convertY(corner.y);
         }),
         false,
@@ -193,13 +194,13 @@ module BP3D.Floorplanner {
     }
 
     /** */
-    private drawRoom(room: Model.Room) {
+    private drawRoom(room: Room) {
       var scope = this;
       this.drawPolygon(
-        Core.Utils.map(room.corners, (corner: Model.Corner) => {
+        Utils.map(room.corners, (corner: Corner) => {
           return scope.viewmodel.convertX(corner.x);
         }),
-        Core.Utils.map(room.corners, (corner: Model.Corner) =>  {
+        Utils.map(room.corners, (corner: Corner) =>  {
           return scope.viewmodel.convertY(corner.y);
         }),
         true,
@@ -208,7 +209,7 @@ module BP3D.Floorplanner {
     }
 
     /** */
-    private drawCorner(corner: Model.Corner) {
+    private drawCorner(corner: Corner) {
       var hover = (corner === this.viewmodel.activeCorner);
       var color = cornerColor;
       if (hover && this.viewmodel.mode == floorplannerModes.DELETE) {
@@ -309,4 +310,3 @@ module BP3D.Floorplanner {
       }
     }
   }
-}

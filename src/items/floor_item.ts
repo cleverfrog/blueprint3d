@@ -1,15 +1,16 @@
-/// <reference path="../../lib/three.d.ts" />
-/// <reference path="../model/model.ts" />
-/// <reference path="item.ts" />
-/// <reference path="metadata.ts" />
+import * as THREE from 'three'
 
-module BP3D.Items {
+import { Utils } from "../core/utils";
+import { Model } from "../model/model";
+import { Item } from "./item";
+import { Metadata } from "./metadata";
+
   /**
    * A Floor Item is an entity to be placed related to a floor.
    */
   export abstract class FloorItem extends Item {
-    constructor(model: Model.Model, metadata: Metadata, geometry: THREE.Geometry, material: THREE.MeshFaceMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
-      super(model, metadata, geometry, material, position, rotation, scale);
+    constructor(model: Model, metadata: Metadata, geometries: THREE.BufferGeometry[], material: THREE.MeshStandardMaterial[], root: THREE.Object3D, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
+      super(model, metadata, geometries, material, root, position, rotation, scale);
     };
 
     /** */
@@ -18,7 +19,7 @@ module BP3D.Items {
         var center = this.model.floorplan.getCenter();
         this.position.x = center.x;
         this.position.z = center.z;
-        this.position.y = 0.5 * (this.geometry.boundingBox.max.y - this.geometry.boundingBox.min.y);
+        this.position.y = 0.5 * (this.boundingBox.max.y - this.boundingBox.min.y);
       }
     };
 
@@ -48,8 +49,8 @@ module BP3D.Items {
       var rooms = this.model.floorplan.getRooms();
       var isInARoom = false;
       for (var i = 0; i < rooms.length; i++) {
-        if (Core.Utils.pointInPolygon(vec3.x, vec3.z, rooms[i].interiorCorners) &&
-          !Core.Utils.polygonPolygonIntersect(corners, rooms[i].interiorCorners)) {
+        if (Utils.pointInPolygon(vec3.x, vec3.z, rooms[i].interiorCorners) &&
+          !Utils.polygonPolygonIntersect(corners, rooms[i].interiorCorners)) {
           isInARoom = true;
         }
       }
@@ -77,4 +78,3 @@ module BP3D.Items {
       return true;
     }
   }
-}

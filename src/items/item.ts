@@ -1,20 +1,32 @@
-/// <reference path="../../lib/three.d.ts" />
-/// <reference path="../core/utils.ts" />
-/// <reference path="../model/model.ts" />
-/// <reference path="metadata.ts" />
+import * as THREE from 'three'
 
-module BP3D.Items {
+import { Model } from '../model/model';
+import { Utils } from '../core/utils';
+import { Scene } from '../model/scene';
+import { Metadata } from "./metadata";
   /**
    * An Item is an abstract entity for all things placed in the scene,
    * e.g. at walls or on the floor.
    */
-  export abstract class Item extends THREE.Mesh {
+
+
+  const isMaterialArray = (obj: THREE.Material | THREE.Material[]): obj is THREE.Material[] => {
+    return ((obj as THREE.Material[]).length !== undefined);
+  }
+
+  export abstract class Item extends THREE.Object3D {
 
     /** */
-    private scene: Model.Scene;
+    public isBP3DItem = true;
+    private scene: Scene;
 
+    public boundingBox = new THREE.Box3();
+    public boundingBoxHelper = new THREE.BoxHelper(this);
+
+    public materials: THREE.MeshStandardMaterial[];
+    public matOrigColors: any[] = new Array();
     /** */
-    private errorGlow = new THREE.Mesh();
+    private errorGlow = new THREE.Object3D();
 
     /** */
     private hover = false;
@@ -55,22 +67,24 @@ module BP3D.Items {
     /** */
     protected halfSize: THREE.Vector3;
 
+    geometries: THREE.BufferGeometry[];
+
     /** Constructs an item. 
      * @param model TODO
      * @param metadata TODO
-     * @param geometry TODO
-     * @param material TODO
+     * @param geometries TODO
+     * @param materials TODO
+     * @param root
      * @param position TODO
      * @param rotation TODO
      * @param scale TODO 
      */
-    constructor(protected model: Model.Model, public metadata: Metadata, geometry: THREE.Geometry, material: THREE.MeshFaceMaterial, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
+    constructor(protected model: Model, public metadata: Metadata, geometries: THREE.BufferGeometry[], materials: THREE.MeshStandardMaterial[], root: THREE.Object3D, position: THREE.Vector3, rotation: number, scale: THREE.Vector3) {
       super();
 
       this.scene = this.model.scene;
-      this.geometry = geometry;
-      this.material = material;
-
+      this.geometries = geometries;
+      this.materials = materials;
       this.errorColor = 0xff0000;
 
       this.resizable = metadata.resizable;
@@ -78,24 +92,66 @@ module BP3D.Items {
       this.castShadow = true;
       this.receiveShadow = false;
 
-      this.geometry = geometry;
-      this.material = material;
 
-      if (position) {
-        this.position.copy(position);
-        this.position_set = true;
-      } else {
-        this.position_set = false;
+      for(let tChild of root.children) {
+        this.add(tChild)
+    }
+    let i = 0;
+    if(this.children.length) {
+      for(let c of this.children as any) {
+        if(c.type === "Mesh") {
+          this.matOrigColors.push([]);
+          if(isMaterialArray(c.material)) {
+            for(let mat of c.material) {
+              this.matOrigColors[i].push(new THREE.Color().copy(mat.color));
+            }  
+          }
+          else {
+            this.matOrigColors[i].push(new THREE.Color().copy(c.material.color));
+          }
+        }
+        i++;
       }
+    }
+    else {
+      for(let mat of this.materials) {
+        this.matOrigColors.push(new THREE.Color().copy(mat.color));
+      }
+    }
 
+//      this.computeOverallBoundingBox();
+      this.boundingBox.setFromObject(this);
+      this.boundingBoxHelper.setFromObject(this);
+      let center = new THREE.Vector3();
+    // this will give us the actual center in root object space
+      this.boundingBox.getCenter(center);
+      center.negate();
+      
+      for(let g of this.geometries) {
+        g.applyMatrix4(new THREE.Matrix4().makeTranslation(
+          center.x, center.y, center.z));
+      }
+      
+      this.boundingBox.setFromObject(this);
+      this.boundingBoxHelper.setFromObject(this);
+      // this.geometry.computeBoundingBox();
       // center in its boundingbox
-      this.geometry.computeBoundingBox();
-      this.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(
-        - 0.5 * (this.geometry.boundingBox.max.x + this.geometry.boundingBox.min.x),
-        - 0.5 * (this.geometry.boundingBox.max.y + this.geometry.boundingBox.min.y),
-        - 0.5 * (this.geometry.boundingBox.max.z + this.geometry.boundingBox.min.z)
-      ));
-      this.geometry.computeBoundingBox();
+/*      for(let g of this.geometries) {
+        g.applyMatrix4(new THREE.Matrix4().makeTranslation(
+           - 0.5 * (this.boundingBox.max.x - this.boundingBox.min.x),
+           - 0.5 * (this.boundingBox.max.y - this.boundingBox.min.y),
+           - 0.5 * (this.boundingBox.max.z - this.boundingBox.min.z)
+        ));
+      }
+*/
+      
+      // this.geometry.computeBoundingBox();
+//      this.computeOverallBoundingBox();
+      this.boundingBox.setFromObject(this);  
+      this.boundingBoxHelper.setFromObject(this);  
+
+      this.add(this.boundingBoxHelper);
+
       this.halfSize = this.objectHalfSize();
 
       if (rotation) {
@@ -105,10 +161,17 @@ module BP3D.Items {
       if (scale != null) {
         this.setScale(scale.x, scale.y, scale.z);
       }
+      if (position) {
+        this.position.copy(position);
+        this.position_set = true;
+      } else {
+        this.position_set = false;
+      }
+
     };
 
     /** */
-    public remove() {
+    public removeThisItem() {
       this.scene.removeItem(this);
     };
 
@@ -172,10 +235,56 @@ module BP3D.Items {
       var on = this.hover || this.selected;
       this.highlighted = on;
       var hex = on ? this.emissiveColor : 0x000000;
-      (<THREE.MeshFaceMaterial>this.material).materials.forEach((material) => {
-        // TODO_Ekki emissive doesn't exist anymore?
-        (<any>material).emissive.setHex(hex);
-      });
+      // this seems to have been broken anyway - but we need to refactor this for ThreeR159
+      let c = 0;
+      if(this.children.length) {
+        for(let c = 0; c < this.children.length; c++) {
+          let child = this.children[c] as any;
+          if(child.type !== "Mesh")
+            continue;
+          if(isMaterialArray(child.material)) {
+            let m = 0;
+            for(let mat of child.material) {
+              mat.color.set(
+                this.matOrigColors[c][m].r,
+                this.matOrigColors[c][m].g,
+                this.matOrigColors[c][m].b);
+              m++;
+            }
+          }
+          else {
+            let matOrigColor = this.matOrigColors[c];
+             matOrigColor = matOrigColor[0];
+            child.material.color.set( 
+              this.matOrigColors[c][0].r,
+              this.matOrigColors[c][0].g,
+              this.matOrigColors[c][0].b);
+          }
+        }
+        c++;
+      }
+      else {
+        if(isMaterialArray(this.materials)) {
+          for(let i = 0; i < this.materials.length; i++) {
+            let mat = this.materials[i];
+            if(this.highlighted) {
+              mat.color.set(0x00FFFF)
+            }
+            else {
+              mat.color.set(
+                this.matOrigColors[i].r,
+                this.matOrigColors[i].g,
+                this.matOrigColors[i].b);
+            }
+              mat.needsUpdate = true;
+          }
+        }
+      
+/*        for(<THREE.MeshStandardMaterial>this.material).forEach((material) => {
+          // TODO_Ekki emissive doesn't exist anymore?
+          (<any>material).emissive.setHex(hex);
+        } )*/;
+    }
     }
 
     /** */
@@ -219,7 +328,7 @@ module BP3D.Items {
     /** */
     public rotate(intersection) {
       if (intersection) {
-        var angle = Core.Utils.angle(
+        var angle = Utils.angle(
           0,
           1,
           intersection.point.x - this.position.x,
@@ -257,6 +366,29 @@ module BP3D.Items {
      */
     public customIntersectionPlanes() {
       return [];
+    }
+
+    public computeOverallBoundingBox() {
+      let g: THREE.BufferGeometry;
+      let min = new THREE.Vector3;
+      let max = new THREE.Vector3;
+
+      for(g of this.geometries) {
+          g.computeBoundingBox();
+		    if(g.boundingBox.min.x < min.x)
+  				min.x = g.boundingBox.min.x;
+    		if(g.boundingBox.max.x > max.x)
+			  	max.x = g.boundingBox.max.x;
+	    	if(g.boundingBox.min.y < min.y)
+				  min.y = g.boundingBox.min.y;
+		    if(g.boundingBox.max.y > max.y)
+				  max.y = g.boundingBox.max.y;
+		    if(g.boundingBox.min.z < min.z)
+				  min.z = g.boundingBox.min.z;
+		    if(g.boundingBox.max.z > max.z)
+				  max.z = g.boundingBox.max.z;
+	    }
+      this.boundingBox = new THREE.Box3(min, max);
     }
 
     /** 
@@ -315,7 +447,7 @@ module BP3D.Items {
       if (!this.error) {
         this.error = true;
         this.errorGlow = this.createGlow(this.errorColor, 0.8, true);
-        this.scene.add(this.errorGlow);
+        this.scene.add(this.errorGlow as any);
       }
       this.errorGlow.position.copy(vec3);
     }
@@ -324,19 +456,20 @@ module BP3D.Items {
     public hideError() {
       if (this.error) {
         this.error = false;
-        this.scene.remove(this.errorGlow);
+        this.scene.remove(this.errorGlow as any);
       }
     }
 
     /** */
     private objectHalfSize(): THREE.Vector3 {
       var objectBox = new THREE.Box3();
-      objectBox.setFromObject(this);
+      objectBox.setFromObject(<any>this);
+      // check logic of typing this 'any'
       return objectBox.max.clone().sub(objectBox.min).divideScalar(2);
     }
 
     /** */
-    public createGlow(color, opacity, ignoreDepth): THREE.Mesh {
+    public createGlow(color, opacity, ignoreDepth): THREE.Object3D {
       ignoreDepth = ignoreDepth || false
       opacity = opacity || 0.2;
       var glowMaterial = new THREE.MeshBasicMaterial({
@@ -347,11 +480,19 @@ module BP3D.Items {
         depthTest: !ignoreDepth
       });
 
-      var glow = new THREE.Mesh(<THREE.Geometry>this.geometry.clone(), glowMaterial);
+      var glow = new THREE.Object3D();
+      let child: any;
+      for(child of this.children) {
+        let tChild = new THREE.Mesh().clone(child);
+        tChild.traverse(function(kid : THREE.Mesh) {
+          kid.material = glowMaterial;
+        });
+        glow.add(tChild);
+      }
       glow.position.copy(this.position);
       glow.rotation.copy(this.rotation);
       glow.scale.copy(this.scale);
       return glow;
     };
   }
-}
+

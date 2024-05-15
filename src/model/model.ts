@@ -1,12 +1,10 @@
-/// <reference path="../../lib/three.d.ts" />
+import * as THREE from 'three'
 /// <reference path="../../lib/jQuery.d.ts" />
-/// <reference path="floorplan.ts" />
-/// <reference path="scene.ts" />
 
-module BP3D.Model {
-  /** 
-   * A Model connects a Floorplan and a Scene. 
-   */
+import { Floorplan } from "./floorplan";
+import { Scene } from "./scene";
+
+
   export class Model {
 
     /** */
@@ -58,6 +56,7 @@ module BP3D.Model {
           item_name: object.metadata.itemName,
           item_type: object.metadata.itemType,
           model_url: object.metadata.modelUrl,
+          geometryScale: object.metadata.geometryScale,
           xpos: object.position.x,
           ypos: object.position.y,
           zpos: object.position.z,
@@ -87,7 +86,8 @@ module BP3D.Model {
           itemName: item.item_name,
           resizable: item.resizable,
           itemType: item.item_type,
-          modelUrl: item.model_url
+          modelUrl: item.model_url,
+          geometryScale: item.geometryScale || 1.0
         };
         var scale = new THREE.Vector3(
           item.scale_x,
@@ -105,4 +105,4 @@ module BP3D.Model {
       });
     }
   }
-}
+

@@ -1,6 +1,6 @@
-/// <reference path="../../lib/three.d.ts" />
+import * as THREE from 'three'
+var updateShadowCamera;
 
-module BP3D.Three {
   export var Lights = function (scene, floorplan) {
 
     var scope = this;
@@ -17,12 +17,13 @@ module BP3D.Three {
     }
 
     function init() {
-      var light = new THREE.HemisphereLight(0xffffff, 0x888888, 1.1);
+       /* tslint:disable-next-line */
+      var light = new THREE.HemisphereLight(0xffffff, 0x888888, 0.6);
       light.position.set(0, height, 0);
       scene.add(light);
 
-      dirLight = new THREE.DirectionalLight(0xffffff, 0);
-      dirLight.color.setHSL(1, 1, 0.1);
+      dirLight = new THREE.DirectionalLight(0xffffff, 2);
+      dirLight.color.setRGB(1, 1, 1);
 
       dirLight.castShadow = true;
 
@@ -41,7 +42,7 @@ module BP3D.Three {
       floorplan.fireOnUpdatedRooms(updateShadowCamera);
     }
 
-    function updateShadowCamera() {
+    this.updateShadowCamera = function() {
 
       var size = floorplan.getSize();
       var d = (Math.max(size.z, size.x) + tol) / 2.0;
@@ -66,7 +67,6 @@ module BP3D.Three {
         dirLight.shadowCamera.updateProjectionMatrix();
       }
     }
-
+updateShadowCamera = this.updateShadowCamera;
     init();
   }
-}

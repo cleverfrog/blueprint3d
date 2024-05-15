@@ -1,8 +1,9 @@
-/// <reference path="../../lib/three.d.ts" />
+import * as THREE from 'three'
 /// <reference path="../../lib/jQuery.d.ts" />
-/// <reference path="../core/utils.ts" />
 
-module BP3D.Model {
+import { Room } from "../model/room";
+import { Utils } from "../core/utils";
+import { Wall } from "../model/wall";
   /**
    * Half Edges are created by Room.
    * 
@@ -105,12 +106,15 @@ module BP3D.Model {
       var v4 = v1.clone();
       v4.y = this.wall.height;
 
-      var geometry = new THREE.Geometry();
-      geometry.vertices = [v1, v2, v3, v4];
-
+      var geometry = new THREE.BufferGeometry().setFromPoints( [v1, v2, v3, v4]);
+      let indices = new Uint16Array([0, 1, 2, 0, 2, 3]);
+      geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+      /* ChangedForR159 - check logic replacement 
       geometry.faces.push(new THREE.Face3(0, 1, 2));
       geometry.faces.push(new THREE.Face3(0, 2, 3));
+      
       geometry.computeFaceNormals();
+      */
       geometry.computeBoundingBox();
 
       this.plane = new THREE.Mesh(geometry,
@@ -129,7 +133,7 @@ module BP3D.Model {
     public interiorDistance(): number {
       var start = this.interiorStart();
       var end = this.interiorEnd();
-      return Core.Utils.distance(start.x, start.y, end.x, end.y);
+      return Utils.distance(start.x, start.y, end.x, end.y);
     }
 
     private computeTransforms(transform, invTransform, start, end) {
@@ -137,14 +141,17 @@ module BP3D.Model {
       var v1 = start;
       var v2 = end;
 
-      var angle = Core.Utils.angle(1, 0, v2.x - v1.x, v2.y - v1.y);
+      var angle = Utils.angle(1, 0, v2.x - v1.x, v2.y - v1.y);
 
       var tt = new THREE.Matrix4();
       tt.makeTranslation(-v1.x, 0, -v1.y);
       var tr = new THREE.Matrix4();
       tr.makeRotationY(-angle);
       transform.multiplyMatrices(tr, tt);
-      invTransform.getInverse(transform);
+      //ChangedForR159
+      invTransform.copy(transform);
+      invTransform.invert();
+      //
     }
 
     /** Gets the distance from specified point.
@@ -154,7 +161,7 @@ module BP3D.Model {
      */
     public distanceTo(x: number, y: number): number {
       // x, y, x1, y1, x2, y2
-      return Core.Utils.pointDistanceFromLine(x, y,
+      return Utils.pointDistanceFromLine(x, y,
         this.interiorStart().x,
         this.interiorStart().y,
         this.interiorEnd().x,
@@ -263,7 +270,7 @@ module BP3D.Model {
       }
 
       // CCW angle between edges
-      var theta = Core.Utils.angle2pi(
+      var theta = Utils.angle2pi(
         v1startX - v1endX,
         v1startY - v1endY,
         v2endX - v1endX,
@@ -281,7 +288,7 @@ module BP3D.Model {
       var vy = v2dx * sn + v2dy * cs;
 
       // normalize
-      var mag = Core.Utils.distance(0, 0, vx, vy);
+      var mag = Utils.distance(0, 0, vx, vy);
       var desiredMag = (this.offset) / sn;
       var scalar = desiredMag / mag;
 
@@ -293,4 +300,3 @@ module BP3D.Model {
       return halfAngleVector;
     }
   }
-}

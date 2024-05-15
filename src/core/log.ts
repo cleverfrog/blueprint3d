@@ -1,5 +1,3 @@
-module BP3D.Core {
-
   /** Enumeration of log contexts. */
   export enum ELogContext {
     /** Log nothing. */
@@ -85,4 +83,3 @@ module BP3D.Core {
 
     console.log(tPrefix + message);
   }
-}

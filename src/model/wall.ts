@@ -1,12 +1,13 @@
-/// <reference path="../../lib/three.d.ts" />
+import * as THREE from 'three'
 /// <reference path="../../lib/jQuery.d.ts" />
-/// <reference path="../core/configuration.ts" />
-/// <reference path="../core/utils.ts" />
-/// <reference path="../items/item.ts" />
-/// <reference path="corner.ts" />
-/// <reference path="half_edge.ts" />
 
-module BP3D.Model {
+import { Configuration, configWallThickness, configWallHeight } from "../core/configuration";
+import { Utils } from "../core/utils";
+import { Item } from "../items/item";
+import { Corner } from "./corner";
+import { HalfEdge } from "./half_edge";
+
+
   /** The default wall texture. */
   const defaultWallTexture = {
     url: "rooms/textures/wallmap.png",
@@ -34,10 +35,10 @@ module BP3D.Model {
     public orphan = false;
 
     /** Items attached to this wall */
-    public items: Items.Item[] = [];
+    public items: Item[] = [];
 
     /** */
-    public onItems: Items.Item[] = [];
+    public onItems: Item[] = [];
 
     /** The front-side texture. */
     public frontTexture = defaultWallTexture;
@@ -46,10 +47,10 @@ module BP3D.Model {
     public backTexture = defaultWallTexture;
 
     /** Wall thickness. */
-    public thickness = Core.Configuration.getNumericValue(Core.configWallThickness);
+    public thickness = Configuration.getNumericValue(configWallThickness);
 
     /** Wall height. */
-    public height = Core.Configuration.getNumericValue(Core.configWallHeight);
+    public height = Configuration.getNumericValue(configWallHeight);
 
     /** Actions to be applied after movement. */
     private moved_callbacks = $.Callbacks();
@@ -171,7 +172,7 @@ module BP3D.Model {
     }
 
     public distanceFrom(x: number, y: number): number {
-      return Core.Utils.pointDistanceFromLine(x, y,
+      return Utils.pointDistanceFromLine(x, y,
         this.getStartX(), this.getStartY(),
         this.getEndX(), this.getEndY());
     }
@@ -190,4 +191,4 @@ module BP3D.Model {
       }
     }
   }
-}
+
