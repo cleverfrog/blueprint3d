@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Blueprint 3D - Example</title>
+    <meta charset="utf-8" />
+    <title>Room Configurator - Example</title>
 
     <link href="css/bootstrap.css" rel="stylesheet">
-    <link href="css/example.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
 
     <script src="js/three.min.js"></script>
     <script src="js/blueprint3d.js"></script>
@@ -179,13 +180,13 @@
             <div id="loading-modal">
               <h1>Loading...</h1>  
             </div>
+            <canvas id="three-canvas"></canvas>
           </div>
 
           <!-- 2D Floorplanner -->
           <div id="floorplanner">
             <canvas id="floorplanner-canvas"></canvas>
             <div id="floorplanner-controls">
-
               <button id="move" class="btn btn-sm btn-default">
                 <span class="glyphicon glyphicon-move"></span>
                 Move Walls
@@ -220,6 +221,14 @@
         <!-- End Right Column -->
       </div>
     </div>
-
+    <script> var exports = {}; </script>
+    <script src="libs/jquery.js"></script>
+    <script src="libs/bootstrap.js"></script>
+    <script src="js/items.js"></script>
+    <script src="js/walls.js"></script>
+    <script src="js/floors.js"></script>
+    <script type="module" src="./blueprint3d.js"></script>
+    <script type="module" src="./app.js"></script>
+    <script src="blueprint3d.js"></script>
   </body>
 </html>
