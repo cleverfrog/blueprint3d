@@ -6,15 +6,6 @@
 
     <link href="css/bootstrap.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
-
-    <script src="js/three.min.js"></script>
-    <script src="js/blueprint3d.js"></script>
-
-    <script src="js/jquery.js"></script>
-    <script src="js/bootstrap.js"></script>
-    
-    <script src="js/items.js"></script>
-    <script src="js/example.js"></script>
   </head>
 
   <body>
@@ -96,8 +87,8 @@
               <div class="panel-body" style="color: #333333">
 
                 <div class="col-sm-6" style="padding: 3px">
-                  <a href="#" class="thumbnail texture-select-thumbnail" texture-url="rooms/textures/light_fine_wood.jpg" texture-stretch="false" texture-scale="300">
-                    <img alt="Thumbnail light fine wood" src="rooms/thumbnails/thumbnail_light_fine_wood.jpg" />
+                  <a href="#" class="thumbnail texture-select-thumbnail" texture-url="app/rooms/textures/light_fine_wood.jpg" texture-stretch="false" texture-scale="300">
+                    <img alt="Thumbnail light fine wood" src="app/rooms/thumbnails/thumbnail_light_fine_wood.jpg" />
                   </a>
                 </div>
               </div>
@@ -150,30 +141,36 @@
 
             <div id="camera-controls">
               <a href="#" class="btn btn-default bottom" id="zoom-out">
-                <span class="glyphicon glyphicon-zoom-out"></span>
+                <span class="glyphicon glyphicon-zoom-out">
+                  <object data = "css/icons/zoom-out.svg"></object>
+                </span>
               </a>
               <a href="#" class="btn btn-default bottom" id="reset-view">
-                <span class="glyphicon glyphicon glyphicon-home"></span>
+                <span class="glyphicon glyphicon glyphicon-home">
+                  <object data = "css/icons/circle.svg"></object>
+                </span>
               </a>
               <a href="#" class="btn btn-default bottom" id="zoom-in">
-                <span class="glyphicon glyphicon-zoom-in"></span>
+                <span class="glyphicon glyphicon-zoom-in">
+                  <object data = "css/icons/zoom-in.svg"></object>
+                </span>
               </a>
               
               <span>&nbsp;</span>
 
               <a class="btn btn-default bottom" href="#" id="move-left" >
-                <span class="glyphicon glyphicon-arrow-left"></span>
+                <span><object data ="css/icons/arrow-left-short.svg"></object></span>
               </a>
               <span class="btn-group-vertical">
                 <a class="btn btn-default" href="#" id="move-up">
-                  <span class="glyphicon glyphicon-arrow-up"></span>
+                  <span class="glyphicon glyphicon-arrow-up"><object data ="css/icons/arrow-up-short.svg"></object></span>
                 </a>
                 <a class="btn btn-default" href="#" id="move-down">
-                  <span class="glyphicon glyphicon-arrow-down"></span>
+                  <span class="glyphicon glyphicon-arrow-down"><object data ="css/icons/arrow-down-short.svg"></object></span>
                 </a>
               </span>
               <a class="btn btn-default bottom" href="#" id="move-right" >
-                <span class="glyphicon glyphicon-arrow-right"></span>
+                <span class="glyphicon glyphicon-arrow-right"><object data ="css/icons/arrow-right-short.svg"></object></span>
               </a>
             </div>
 
@@ -187,6 +184,7 @@
           <div id="floorplanner">
             <canvas id="floorplanner-canvas"></canvas>
             <div id="floorplanner-controls">
+
               <button id="move" class="btn btn-sm btn-default">
                 <span class="glyphicon glyphicon-move"></span>
                 Move Walls

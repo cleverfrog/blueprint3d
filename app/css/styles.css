@@ -280,6 +280,9 @@ a.add-item:hover > img {
   display: block;
 }
 
+.btn object {
+  pointer-events: none;
+}
 @keyframes fadeIn {
   0% {
     opacity: 0;

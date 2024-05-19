@@ -17,7 +17,7 @@ var Polygon = require('polygon')
 
   /** Default texture to be used if nothing is provided. */
   const defaultRoomTexture = {
-    url: "rooms/textures/medium_hardwood.jpg",
+    url: "rooms/textures/hardwood.png",
     scale: 400
   }
 

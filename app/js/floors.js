@@ -9,8 +9,8 @@ $(document).ready(function() {
     },
     {
       "name": "Medium Hardwood",
-      "image": "rooms/thumbnails/medium_hardwood.jpg",
-      "model": "rooms/textures/medium_hardwood.jpg",
+      "image": "rooms/thumbnails/hardwood.jpg",
+      "model": "rooms/textures/hardwood.png",
       "texture_stretch": "false",
       "texture_scale": "300"
     },

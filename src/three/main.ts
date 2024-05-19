@@ -7,7 +7,7 @@ declare global {
 }
 import { Controller } from "./controller";
 import { Controls } from "./controls";
-import { Floorplan } from "./floorPlan";
+import { Floorplan } from "./floorplan";
 import { HUD } from "./hud";
 import { Lights } from "./lights";
 import { Skybox } from "./skybox";
